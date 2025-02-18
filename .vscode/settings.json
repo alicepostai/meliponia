@@ -1,0 +1,16 @@
+{
+	"files.exclude": {
+		"**/.git": true,
+		"**/node_modules": true,
+		"android/": true,
+		"ios/": true,
+		"*lock.json": true,
+		"*config*": true,
+		"Gemfile": true,
+		".ruby-version": true,
+		".eslintrc.js": true,
+		".prettierrc": true,
+		"app.json": true,
+		".gitignore": true
+	}
+}

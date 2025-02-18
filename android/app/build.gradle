@@ -84,6 +84,12 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        externalNativeBuild {
+            cmake {
+                cppFlags "-frtti -fexceptions"
+                arguments "-DCMAKE_OBJECT_PATH_MAX=250"
+            }
+        }
     }
     signingConfigs {
         debug {
