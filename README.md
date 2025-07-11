@@ -129,6 +129,12 @@ O **Meliponia** é um aplicativo mobile desenvolvido para meliponicultores que d
 
 ## 🚀 Instalação e Configuração
 
+### 1. **Baixe o APK no link abaixo**
+
+https://expo.dev/accounts/alicepostai/projects/Meliponia/builds/91dba72d-816e-4738-99dc-3055962760fd
+
+OU
+
 ### 1. **Clone o repositório**
 
 ```bash
