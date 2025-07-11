@@ -155,30 +155,7 @@ EXPO_PUBLIC_SUPABASE_URL=sua_url_do_supabase
 EXPO_PUBLIC_SUPABASE_ANON_KEY=sua_chave_anonima
 ```
 
-### 4. **Configure o Supabase**
-
-#### 4.1 Configuração básica das tabelas
-
-- Siga o guia detalhado em [`SUPABASE_SETUP.md`](./SUPABASE_SETUP.md)
-- Configure as tabelas e políticas RLS
-- Ative a autenticação por email
-
-#### 4.2 Configuração do Storage (IMPORTANTE)
-
-Para que o upload de imagens funcione corretamente, você precisa configurar o Storage:
-
-**Opção 1 - Script automático (recomendado):**
-
-1. Acesse o SQL Editor no painel do Supabase
-2. Execute o script [`setup-supabase-storage.sql`](./setup-supabase-storage.sql)
-
-**Opção 2 - Configuração manual:**
-
-1. Siga as instruções detalhadas em [`SUPABASE_STORAGE_SETUP.md`](./SUPABASE_STORAGE_SETUP.md)
-
-⚠️ **Nota importante:** Sem a configuração do Storage, você receberá o erro "Erro no Banco - Ocorreu um erro desconhecido" ao tentar adicionar fotos nas colmeias.
-
-### 5. **Inicie o projeto**
+### 4. **Inicie o projeto**
 
 ```bash
 npm start
@@ -212,37 +189,6 @@ npx expo start
 
 ---
 
-## 📂 Estrutura do Projeto
-
-```
-📦 meliponia/
-├── 📁 app/                     # Rotas do Expo Router
-│   ├── 📁 (app)/              # Área autenticada
-│   ├── 📁 (auth)/             # Telas de autenticação
-│   └── 📄 _layout.tsx         # Layout principal
-├── 📁 src/
-│   ├── 📁 components/         # Componentes reutilizáveis
-│   │   ├── 📁 buttons/        # Botões customizados
-│   │   ├── 📁 cards/          # Cards de informação
-│   │   ├── 📁 forms/          # Componentes de formulário
-│   │   ├── 📁 maps/           # Componentes de mapa
-│   │   └── 📁 modals/         # Modais e overlays
-│   ├── 📁 constants/          # Constantes e configurações
-│   │   ├── 📄 BeeSpeciesList.ts # 90+ espécies brasileiras
-│   │   └── 📄 AppConstants.ts  # Configurações gerais
-│   ├── 📁 contexts/           # Contextos React
-│   ├── 📁 hooks/              # Hooks customizados
-│   ├── 📁 screens/            # Telas do aplicativo
-│   ├── 📁 services/           # Serviços e APIs
-│   ├── 📁 theme/              # Tema e estilos
-│   ├── 📁 types/              # Tipos TypeScript
-│   └── 📁 utils/              # Utilitários
-├── 📁 assets/                 # Recursos estáticos
-└── 📄 package.json           # Dependências
-```
-
----
-
 ## 🐝 Espécies Suportadas
 
 O aplicativo inclui um catálogo completo com **90+ espécies** de abelhas sem ferrão brasileiras, incluindo:
@@ -262,27 +208,6 @@ Cada espécie inclui:
 - 🔬 **Nome científico**
 - 📍 **Distribuição geográfica**
 - ℹ️ **Características distintivas**
-
----
-
-## 🔧 Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-npm start              # Inicia o servidor Expo
-npm run android        # Executa no Android
-npm run ios           # Executa no iOS
-npm run web           # Executa na web
-
-# Qualidade do Código
-npm run lint          # Executa o linter
-npm test             # Executa os testes
-npm run type-check   # Verifica tipos TypeScript
-
-# Build e Deploy
-npm run build         # Build para produção
-npm run preview       # Preview do build
-```
 
 ---
 
@@ -341,7 +266,6 @@ git push origin feature/nova-funcionalidade
 ### **💡 Tem uma sugestão?**
 
 - Use as [Discussions do GitHub](https://github.com/seu-usuario/meliponia/discussions)
-- Participe da comunidade de meliponicultores
 
 ### **📧 Contato Direto**
 
