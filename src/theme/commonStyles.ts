@@ -1,0 +1,223 @@
+import { StyleSheet } from 'react-native';
+import { AppColorPalette } from '@/theme/colors';
+import { fonts, fontSizes } from '@/theme/fonts';
+import { metrics } from '@/theme/metrics';
+
+export const createCommonStyles = (colors: AppColorPalette) => {
+  return StyleSheet.create({
+    centeredContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: metrics.xl,
+    },
+    feedbackContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: metrics.xl,
+    },
+    feedbackText: {
+      fontSize: fontSizes.lg,
+      fontFamily: fonts.Medium,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: metrics.md,
+    },
+    errorText: {
+      color: colors.error,
+    },
+    loadingText: {
+      fontSize: fontSizes.md,
+      fontFamily: fonts.Regular,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      marginTop: metrics.md,
+    },
+    retryButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginTop: metrics.xl,
+      backgroundColor: colors.honey,
+      paddingVertical: metrics.md,
+      paddingHorizontal: metrics.xl,
+      borderRadius: metrics.borderRadiusPill,
+    },
+    retryButtonText: {
+      color: colors.white,
+      fontFamily: fonts.SemiBold,
+      fontSize: fontSizes.md,
+    },
+    primaryButton: {
+      backgroundColor: colors.honey,
+      paddingVertical: metrics.md,
+      paddingHorizontal: metrics.xl,
+      borderRadius: metrics.borderRadiusPill,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    primaryButtonText: {
+      color: colors.white,
+      fontFamily: fonts.SemiBold,
+      fontSize: fontSizes.md,
+    },
+    secondaryButton: {
+      backgroundColor: colors.secondary,
+      paddingVertical: metrics.sm,
+      paddingHorizontal: metrics.lg,
+      borderRadius: metrics.borderRadiusSmall,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    secondaryButtonText: {
+      color: colors.white,
+      fontFamily: fonts.Medium,
+      fontSize: fontSizes.sm,
+    },
+    modalContainer: {
+      justifyContent: 'flex-end',
+      margin: 0,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: metrics.lg,
+    },
+    modalContent: {
+      backgroundColor: colors.cardBackground,
+      paddingVertical: metrics.xl,
+      paddingHorizontal: metrics.lg,
+      borderRadius: metrics.borderRadiusLarge,
+      width: '100%',
+      maxWidth: 400,
+      shadowColor: colors.black,
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    modalTitle: {
+      fontSize: fontSizes.xl,
+      fontFamily: fonts.SemiBold,
+      marginBottom: metrics.lg,
+      color: colors.text,
+      textAlign: 'center',
+    },
+    modalMessage: {
+      fontSize: fontSizes.md,
+      fontFamily: fonts.Regular,
+      color: colors.textSecondary,
+      textAlign: 'center',
+      lineHeight: 20,
+    },
+    modalButtonContainer: {
+      flexDirection: 'row',
+      marginTop: metrics.xl,
+      gap: metrics.sm,
+    },
+    modalOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: metrics.sm,
+    },
+    modalOptionText: {
+      fontSize: fontSizes.lg,
+      fontFamily: fonts.Regular,
+      marginLeft: metrics.md,
+      color: colors.text,
+    },
+    card: {
+      backgroundColor: colors.cardBackground,
+      borderRadius: metrics.borderRadiusMedium,
+      padding: metrics.md,
+      marginBottom: metrics.lg,
+      shadowColor: colors.black,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    formContainer: {
+      paddingVertical: metrics.lg,
+    },
+    formSection: {
+      marginBottom: metrics.xl,
+    },
+    sectionTitle: {
+      fontSize: fontSizes.lg,
+      fontFamily: fonts.SemiBold,
+      color: colors.text,
+      marginBottom: metrics.sm,
+      paddingHorizontal: metrics.xs,
+    },
+    fieldsGroupContainer: {
+      backgroundColor: colors.cardBackground,
+      borderRadius: metrics.borderRadiusMedium,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: 'hidden',
+    },
+    fieldWrapper: {
+      paddingHorizontal: metrics.md,
+      paddingVertical: metrics.sm,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    lastFieldWrapper: {
+      borderBottomWidth: 0,
+    },
+    textArea: {
+      minHeight: 80,
+      textAlignVertical: 'top',
+      paddingTop: metrics.sm,
+    },
+    submitButton: {
+      marginTop: metrics.lg,
+    },
+    listContent: {
+      paddingHorizontal: metrics.lg,
+      paddingVertical: metrics.md,
+      flexGrow: 1,
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.cardBackground,
+      borderRadius: metrics.borderRadiusMedium,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: metrics.md,
+      height: 44,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: fontSizes.md,
+      fontFamily: fonts.Regular,
+      color: colors.text,
+      paddingVertical: 0,
+    },
+    lightShadow: {
+      shadowColor: colors.black,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    mediumShadow: {
+      shadowColor: colors.black,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 3,
+      elevation: 4,
+    },
+    heavyShadow: {
+      shadowColor: colors.black,
+      shadowOffset: { width: 0, height: 3 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 6,
+    },
+  });
+};

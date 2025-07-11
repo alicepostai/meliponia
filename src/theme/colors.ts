@@ -1,0 +1,94 @@
+export interface AppColorPalette {
+  white: string;
+  black: string;
+  primary: string;
+  secondary: string;
+  gray: string;
+  lightGray: string;
+  darkGray: string;
+  honey: string;
+  honeyLight: string;
+  honeyDark: string;
+  honeySubtle: string;
+  accent: string;
+  error: string;
+  success: string;
+  warning: string;
+  info: string;
+  disabledBackground: string;
+  disabledText: string;
+  background: string;
+  cardBackground: string;
+  text: string;
+  textSecondary: string;
+  border: string;
+  headerBackground: string;
+  headerText: string;
+  tabBarActive: string;
+  tabBarInactive: string;
+  tabBarBackground: string;
+}
+export const lightColors: AppColorPalette = {
+  white: '#FFFFFF',
+  black: '#000000',
+  primary: '#2C3A47',
+  secondary: '#747d8c',
+  gray: '#dfe4ea',
+  lightGray: '#f1f2f6',
+  darkGray: '#57606f',
+  honey: '#F2A65A',
+  honeyLight: '#F7C98B',
+  honeyDark: '#E8924A',
+  honeySubtle: '#FFF4E6',
+  accent: '#F2A65A',
+  error: '#ff4757',
+  success: '#2ed573',
+  warning: '#F2A65A',
+  info: '#3742fa',
+  disabledBackground: '#a4b0be',
+  disabledText: '#ffffff',
+  background: '#f7f9fc',
+  cardBackground: '#FFFFFF',
+  text: '#2C3A47',
+  textSecondary: '#57606f',
+  border: '#ced6e0',
+  headerBackground: '#FFFFFF',
+  headerText: '#2C3A47',
+  tabBarActive: '#F2A65A',
+  tabBarInactive: '#747d8c',
+  tabBarBackground: '#FFFFFF',
+};
+export const darkColors: AppColorPalette = {
+  white: '#FFFFFF',
+  black: '#000000',
+  primary: '#E0E0E0',
+  secondary: '#a4b0be',
+  gray: '#57606f',
+  lightGray: '#3d3d3d',
+  darkGray: '#8c8c8c',
+  honey: '#D4934A',
+  honeyLight: '#E8A65D',
+  honeyDark: '#B8823D',
+  honeySubtle: '#3D2E1F',
+  accent: '#D4934A',
+  error: '#ff5e6c',
+  success: '#3ae374',
+  warning: '#D4934A',
+  info: '#4834df',
+  disabledBackground: '#57606f',
+  disabledText: '#a4b0be',
+  background: '#1e272e',
+  cardBackground: '#2C3A47',
+  text: '#E0E0E0',
+  textSecondary: '#a4b0be',
+  border: '#57606f',
+  headerBackground: '#2C3A47',
+  headerText: '#E0E0E0',
+  tabBarActive: '#D4934A',
+  tabBarInactive: '#a4b0be',
+  tabBarBackground: '#2C3A47',
+};
+export const palettes = {
+  light: lightColors,
+  dark: darkColors,
+};

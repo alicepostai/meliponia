@@ -1,0 +1,84 @@
+# Dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Metro Bundler
+.metro-cache/
+.metro-health-check*
+
+# Secrets and Environment Variables
+.env
+.env.*
+
+!.env.example
+
+# Local env files
+.env*.local
+
+# Logs
+logs/
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.error.log
+
+# Native Build Artifacts & Keys
+*.apk
+*.aab
+*.ipa
+*.ipr
+*.iml
+*.gradle
+local.properties
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.keystore
+build/
+ios/build/
+android/build/
+android/app/build/
+*.xcodeproj/project.pbxproj
+*.xcodeproj/xcuserdata/
+*.xcworkspace/contents.xcworkspacedata
+*.xcworkspace/xcuserdata/
+xcuserdata/
+*.xcscheme
+DerivedData/
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+*.pem # Certificados
+
+# Windows
+ehthumbs.db
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Editor specific
+.vscode/*
+
+!.vscode/settings.json
+
+# Test & Coverage
+coverage/
+*.lcov
+
+# Other temporary files
+*~
+*.swp
