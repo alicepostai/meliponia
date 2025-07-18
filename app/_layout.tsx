@@ -18,6 +18,7 @@ import { supabase } from '@/services/supabase';
 import { DeepLinkingUtils } from '@/utils/deep-linking';
 import { useAuth } from '@/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { useDeepLinking } from '@/hooks/UseDeepLinking';
 
 const createPaperTheme = (themeColors: AppColorPalette, isDarkMode: boolean) => {
   return {
@@ -43,6 +44,9 @@ function ThemedInitialLayoutWithOnboarding() {
   const alertProviderRef = useRef<AlertProviderRef>(null);
   const router = useRouter();
   const { session, loading } = useAuth();
+
+  // Inicializa o sistema de deep linking
+  useDeepLinking();
 
   const [fontsLoaded, fontError] = useFonts({
     [fonts.Bold]: require('../assets/fonts/Poppins-Bold.ttf'),

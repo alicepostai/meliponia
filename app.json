@@ -16,6 +16,21 @@
             "screens": {
               "reset-password": "reset-password"
             }
+          },
+          "(app)": {
+            "screens": {
+              "hive": {
+                "screens": {
+                  "[hiveId]": "hive/:hiveId",
+                  "qr-scanner": "qr-scanner",
+                  "transfer-qr": {
+                    "screens": {
+                      "[hiveId]": "transfer/:hiveId"
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -52,7 +67,16 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "blockedPermissions": []
+      "blockedPermissions": [],
+      "intentFilters": [
+        {
+          "action": "android.intent.action.VIEW",
+          "category": ["android.intent.category.DEFAULT", "android.intent.category.BROWSABLE"],
+          "data": {
+            "scheme": "meliponia"
+          }
+        }
+      ]
     },
     "web": {
       "bundler": "metro",

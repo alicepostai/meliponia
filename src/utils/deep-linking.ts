@@ -38,6 +38,67 @@ export class DeepLinkingUtils {
     return url.startsWith('meliponia://');
   }
 
+  static isHiveQRCode(url: string): boolean {
+    return url.includes('/hive/') || url.includes('"action":"view_hive"');
+  }
+
+  static isTransferQRCode(url: string): boolean {
+    return url.includes('/transfer') || url.includes('"action":"transfer_hive"');
+  }
+
+  static extractHiveIdFromUrl(url: string): string | null {
+    try {
+      // URL format: meliponia://hive/{hiveId}
+      if (url.includes('/hive/')) {
+        const parts = url.split('/hive/');
+        return parts[1]?.split('?')[0] || null;
+      }
+
+      // JSON format: {"action":"view_hive","hiveId":"..."}
+      if (url.includes('"action":"view_hive"')) {
+        const parsed = JSON.parse(url);
+        return parsed.hiveId || null;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Erro ao extrair hiveId:', error);
+      return null;
+    }
+  }
+
+  static generateHiveQRData(hiveId: string, hiveCode?: string, speciesName?: string): string {
+    // Formato híbrido: URL para deep linking + JSON para informações extras
+    const baseUrl = `meliponia://hive/${hiveId}`;
+
+    if (hiveCode || speciesName) {
+      const params = new URLSearchParams();
+      if (hiveCode) params.append('code', hiveCode);
+      if (speciesName) params.append('species', speciesName);
+      return `${baseUrl}?${params.toString()}`;
+    }
+
+    return baseUrl;
+  }
+
+  static generateTransferQRData(
+    hiveId: string,
+    sourceUserId: string,
+    transferType: 'doacao' | 'venda',
+    expiresAt?: Date,
+  ): string {
+    const data = {
+      action: 'transfer_hive',
+      hiveId,
+      sourceUserId,
+      transferType,
+      expiresAt: expiresAt?.toISOString(),
+      createdAt: new Date().toISOString(),
+    };
+
+    return JSON.stringify(data);
+  }
+
   static async processPasswordRecoveryLink(
     url: string,
     supabase: any,

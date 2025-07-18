@@ -7,6 +7,7 @@ import LoadingOverlay from '@/components/ui/loading-overlay';
 import ScreenWrapper from '@/components/ui/screen-wrapper';
 import { usePermissionContext } from '@/contexts/PermissionContext';
 import { useQRScannerScreenStyles } from './styles';
+import { DeepLinkingUtils } from '@/utils/deep-linking';
 const APP_SCHEME = 'meliponia';
 const QRScannerScreen = memo(() => {
   const styles = useQRScannerScreenStyles();
@@ -30,19 +31,23 @@ const QRScannerScreen = memo(() => {
   const handleBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
-    if (data.startsWith(`${APP_SCHEME}://hive/`)) {
-      const hiveId = data.split('/').pop();
+
+    console.log('QR Code escaneado:', data);
+
+    // Verifica se é um QR code de colmeia
+    if (DeepLinkingUtils.isHiveQRCode(data)) {
+      const hiveId = DeepLinkingUtils.extractHiveIdFromUrl(data);
       if (hiveId) {
+        console.log('Navegando para colmeia:', hiveId);
         router.replace(`/hive/${hiveId}`);
       } else {
         Alert.alert('QR Code Inválido', 'Este QR code não é válido para acesso a colmeias.', [
           { text: 'OK', onPress: () => setScanned(false) },
         ]);
       }
-    } else if (
-      data.startsWith(`${APP_SCHEME}://transfer`) ||
-      data.includes('"action":"transfer_hive"')
-    ) {
+    }
+    // Verifica se é um QR code de transferência
+    else if (DeepLinkingUtils.isTransferQRCode(data)) {
       try {
         let transferData;
         if (data.startsWith(`${APP_SCHEME}://transfer`)) {

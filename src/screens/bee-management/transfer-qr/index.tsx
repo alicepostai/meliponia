@@ -16,14 +16,8 @@ import { useTransferQRScreenStyles } from './styles';
 import { useHiveDetails } from '@/hooks/UseHiveDetails';
 import { getBeeNameByScientificName } from '@/utils/helpers';
 import { useCommonNavigation } from '@/hooks/UseCommonNavigation';
-interface TransferQRData {
-  action: 'transfer_hive';
-  hiveId: string;
-  sourceUserId: string;
-  transferType: 'Venda' | 'Doação';
-  timestamp: string;
-  expiresAt: string;
-}
+import { DeepLinkingUtils } from '@/utils/deep-linking';
+
 const TransferQRScreen = memo(() => {
   const styles = useTransferQRScreenStyles();
   const { colors } = useTheme();
@@ -36,15 +30,17 @@ const TransferQRScreen = memo(() => {
   const viewShotRef = React.useRef<ViewShot>(null);
   useEffect(() => {
     if (hive && user?.id) {
-      const transferData: TransferQRData = {
-        action: 'transfer_hive',
-        hiveId: hive.id,
-        sourceUserId: user.id,
-        transferType: hive.status === 'Vendido' ? 'Venda' : 'Doação',
-        timestamp: new Date().toISOString(),
-        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      };
-      setQrData(JSON.stringify(transferData));
+      const transferType = hive.status === 'Vendido' ? 'venda' : 'doacao';
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+
+      const qrContent = DeepLinkingUtils.generateTransferQRData(
+        hive.id,
+        user.id,
+        transferType as 'venda' | 'doacao',
+        expiresAt,
+      );
+
+      setQrData(qrContent);
     }
   }, [hive, user?.id]);
   const handleShare = async () => {

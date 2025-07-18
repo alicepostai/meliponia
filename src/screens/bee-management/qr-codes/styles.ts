@@ -67,8 +67,8 @@ export const useQRCodeItemStyles = () => {
           borderColor: colors.honeyLight + '20',
         },
         qrCodeContainer: {
-          width: 120,
-          height: 120,
+          width: 140,
+          height: 140,
           justifyContent: 'center',
           alignItems: 'center',
           padding: metrics.sm,
@@ -81,6 +81,32 @@ export const useQRCodeItemStyles = () => {
           shadowOffset: { width: 0, height: 1 },
           shadowOpacity: 0.08,
           shadowRadius: 2,
+        },
+        qrInfoContainer: {
+          alignItems: 'center',
+          paddingHorizontal: metrics.md,
+          marginBottom: metrics.lg,
+        },
+        qrInfoText: {
+          fontSize: fontSizes.md,
+          fontFamily: fonts.SemiBold,
+          color: colors.text,
+          marginBottom: metrics.xs,
+          textAlign: 'center',
+        },
+        qrInfoSpecies: {
+          fontSize: fontSizes.sm,
+          fontFamily: fonts.Regular,
+          color: colors.textSecondary,
+          marginBottom: metrics.xs,
+          textAlign: 'center',
+        },
+        qrInfoSubtext: {
+          fontSize: fontSizes.xs,
+          fontFamily: fonts.Regular,
+          color: colors.textSecondary,
+          textAlign: 'center',
+          lineHeight: 16,
         },
         qrPlaceholder: {
           width: '100%',

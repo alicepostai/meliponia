@@ -13,7 +13,7 @@ import { useQRCodesScreenStyles, useQRCodeItemStyles } from './styles';
 import { useQRCodesScreen } from './UseQRCodesScreen';
 import { ProcessedHiveListItem } from '@/types/DataTypes';
 import { getBeeNameByScientificName } from '@/utils/helpers';
-const APP_SCHEME = 'meliponia';
+import { DeepLinkingUtils } from '@/utils/deep-linking';
 const FeedbackState = memo(
   ({ type, onRetry }: { type: 'loading' | 'error' | 'empty'; onRetry: () => void }) => {
     const styles = useQRCodesScreenStyles();
@@ -63,7 +63,14 @@ const QRCodeItem = memo(
   }) => {
     const styles = useQRCodeItemStyles();
     const { colors } = useTheme();
-    const qrData = `${APP_SCHEME}://hive/${item.id}`;
+
+    // Gera QR code melhorado com informações extras
+    const qrData = DeepLinkingUtils.generateHiveQRData(
+      item.id,
+      item.hiveCode || undefined,
+      getBeeNameByScientificName(item.speciesScientificName) || undefined,
+    );
+
     const speciesName =
       getBeeNameByScientificName(item.speciesScientificName) || item.speciesScientificName;
     const [isQrVisible, setIsQrVisible] = useState(false);
@@ -86,7 +93,16 @@ const QRCodeItem = memo(
         >
           <View style={styles.qrCodeContainer}>
             {isQrVisible ? (
-              <QRCode value={qrData} size={100} color="black" backgroundColor="white" />
+              <QRCode
+                value={qrData}
+                size={120}
+                color="black"
+                backgroundColor="white"
+                logo={require('@/assets/images/icon.png')}
+                logoSize={20}
+                logoBackgroundColor="white"
+                logoMargin={2}
+              />
             ) : (
               <TouchableOpacity
                 style={styles.qrPlaceholder}
@@ -97,6 +113,13 @@ const QRCodeItem = memo(
                 <Text style={styles.qrPlaceholderText}>Gerar QR</Text>
               </TouchableOpacity>
             )}
+          </View>
+          <View style={styles.qrInfoContainer}>
+            <Text style={styles.qrInfoText}>Colmeia #{item.hiveCode || 'S/C'}</Text>
+            <Text style={styles.qrInfoSpecies}>{speciesName}</Text>
+            <Text style={styles.qrInfoSubtext}>
+              Escaneie com a câmera do celular{'\n'}ou do app para acessar
+            </Text>
           </View>
         </ViewShot>
         <View style={styles.hiveInfoContainer}>
