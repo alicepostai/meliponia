@@ -3,6 +3,7 @@ import { Stack, SplashScreen, useRouter } from 'expo-router';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { OnboardingProvider } from '@/contexts/OnboardingContext';
+import { PermissionProvider } from '@/contexts/PermissionContext';
 import { Provider as PaperProvider, DefaultTheme as PaperDefaultTheme } from 'react-native-paper';
 import { useFonts } from 'expo-font';
 import { StatusBar } from 'expo-status-bar';
@@ -145,7 +146,9 @@ export default function RootLayout() {
       <ThemeProvider>
         <AuthProvider>
           <OnboardingProvider>
-            <ThemedInitialLayoutWithOnboarding />
+            <PermissionProvider>
+              <ThemedInitialLayoutWithOnboarding />
+            </PermissionProvider>
           </OnboardingProvider>
         </AuthProvider>
       </ThemeProvider>

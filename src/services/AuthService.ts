@@ -43,7 +43,7 @@ export const authService = {
     } catch (e) {
       console.error('Erro inesperado no signIn:', e);
       const error = new AuthError('Um erro inesperado ocorreu durante o login.');
-      AlertService.showError('Erro Inesperado', error.message);
+      AlertService.showError('Erro Inesperado' + error.message);
       return { data: null, error };
     }
   },

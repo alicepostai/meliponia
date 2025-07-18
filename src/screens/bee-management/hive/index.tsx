@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Stack, useRouter } from 'expo-router';
 import ScreenWrapper from '@/components/ui/screen-wrapper';
@@ -134,15 +134,17 @@ const HiveScreen = memo(() => {
           headerTitleStyle: { color: colors.headerText, fontFamily: fonts.SemiBold },
           headerRight: () =>
             hive ? (
-              <Pressable
+              <TouchableOpacity
                 onPress={() => {
+                  console.log('Header menu button pressed'); // Debug log
                   openHeaderMenu();
                 }}
-                style={({ pressed }) => [styles.headerMenuButton, pressed && { opacity: 0.7 }]}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                style={styles.headerMenuButton}
+                activeOpacity={0.7}
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
               >
                 <MaterialCommunityIcons name="dots-vertical" size={24} color={colors.headerText} />
-              </Pressable>
+              </TouchableOpacity>
             ) : null,
         }}
       />

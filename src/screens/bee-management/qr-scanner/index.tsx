@@ -1,31 +1,32 @@
 import React, { useState, useEffect, memo } from 'react';
-import { View, Text, Alert, Pressable } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
+import { View, Text, Alert, TouchableOpacity } from 'react-native';
+import { CameraView } from 'expo-camera';
 import { useRouter, Stack } from 'expo-router';
 import { hiveService } from '@/services/HiveService';
 import LoadingOverlay from '@/components/ui/loading-overlay';
 import ScreenWrapper from '@/components/ui/screen-wrapper';
+import { usePermissionContext } from '@/contexts/PermissionContext';
 import { useQRScannerScreenStyles } from './styles';
 const APP_SCHEME = 'meliponia';
 const QRScannerScreen = memo(() => {
   const styles = useQRScannerScreenStyles();
-  const [permission, requestPermission] = useCameraPermissions();
+  const { status, requestCameraPermission } = usePermissionContext();
   const [scanned, setScanned] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
   console.log('QRScannerScreen render', {
-    permission: permission?.granted,
-    canAskAgain: permission?.canAskAgain,
+    cameraPermission: status.camera,
+    loading: status.loading,
   });
 
   useEffect(() => {
     console.log('QRScannerScreen useEffect permission check');
-    if (!permission?.granted && permission?.canAskAgain) {
+    if (!status.camera && !status.loading) {
       console.log('Requesting camera permission...');
-      requestPermission();
+      requestCameraPermission();
     }
-  }, [permission, requestPermission]);
+  }, [status.camera, status.loading, requestCameraPermission]);
   const handleBarCodeScanned = async ({ data }: { data: string }) => {
     if (scanned) return;
     setScanned(true);
@@ -108,10 +109,10 @@ const QRScannerScreen = memo(() => {
       );
     }
   };
-  if (!permission) {
+  if (status.loading) {
     return <ScreenWrapper children={undefined} />;
   }
-  if (!permission.granted) {
+  if (!status.camera) {
     return (
       <ScreenWrapper>
         <View style={styles.feedbackContainer}>
@@ -134,9 +135,13 @@ const QRScannerScreen = memo(() => {
       />
       {scanned && !isProcessing && (
         <View style={styles.rescanButtonContainer}>
-          <Pressable style={styles.rescanButton} onPress={() => setScanned(false)}>
+          <TouchableOpacity
+            style={styles.rescanButton}
+            onPress={() => setScanned(false)}
+            activeOpacity={0.7}
+          >
             <Text style={styles.rescanButtonText}>Escanear Novamente</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       )}
       <LoadingOverlay visible={isProcessing} text="Processando transferência..." />

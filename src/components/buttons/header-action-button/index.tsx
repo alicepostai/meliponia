@@ -1,5 +1,5 @@
 import React, { memo } from 'react';
-import { Pressable, StyleProp, ViewStyle } from 'react-native';
+import { TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { metrics } from '@/theme/metrics';
@@ -39,20 +39,16 @@ const HeaderActionButton = memo(
     };
 
     return (
-      <Pressable
+      <TouchableOpacity
         onPress={handlePress}
-        style={({ pressed }) => [
-          styles.button,
-          style,
-          disabled && styles.disabledButton,
-          pressed && !disabled && { opacity: 0.7 },
-        ]}
+        style={[styles.button, style, disabled && styles.disabledButton]}
         accessibilityLabel={accessibilityLabel}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         disabled={disabled}
+        activeOpacity={disabled ? 1 : 0.7}
       >
         <MaterialCommunityIcons name={iconName} size={iconSize} color={finalIconColor} />
-      </Pressable>
+      </TouchableOpacity>
     );
   },
 );

@@ -78,7 +78,7 @@ const FastOptionsMenu = memo(
             right: 0,
             bottom: 0,
             backgroundColor: 'rgba(0, 0, 0, 0.3)',
-            zIndex: 999,
+            zIndex: 1000, // Garantir que o backdrop esteja acima de outros elementos
           },
           menuContainer: {
             backgroundColor: colors.cardBackground,
@@ -91,7 +91,7 @@ const FastOptionsMenu = memo(
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 8,
-            zIndex: 1000,
+            zIndex: 1001, // Garantir que o menu esteja acima do backdrop
             borderWidth: 1,
             borderColor: colors.border,
           },
@@ -107,7 +107,12 @@ const FastOptionsMenu = memo(
       [onDismiss],
     );
 
-    if (!isVisible) return null;
+    if (!isVisible) {
+      console.log('FastOptionsMenu: isVisible is false, not rendering');
+      return null;
+    }
+
+    console.log('FastOptionsMenu: Rendering menu with options:', options.length);
 
     const topPosition = anchorPosition?.y ?? topOffset ?? 90;
 
@@ -116,6 +121,7 @@ const FastOptionsMenu = memo(
       position: 'absolute' as const,
       top: topPosition,
       right: 16,
+      zIndex: 1001, // Aumentei o z-index para garantir que apareça acima de outros elementos
     };
 
     return (

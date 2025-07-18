@@ -116,9 +116,11 @@ export const useHiveScreen = () => {
     uploadAndRefresh();
   }, [selectedImage, hiveId, clearSelectedImage, refreshData]);
   const openHeaderMenu = useCallback(() => {
+    console.log('openHeaderMenu called - setting isHeaderMenuVisible to true');
     setIsHeaderMenuVisible(true);
   }, []);
   const closeHeaderMenu = useCallback(() => {
+    console.log('closeHeaderMenu called - setting isHeaderMenuVisible to false');
     setIsHeaderMenuVisible(false);
   }, []);
   const navigateToEdit = useCallback(() => {

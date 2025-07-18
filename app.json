@@ -7,11 +7,9 @@
     "icon": "./assets/images/icon.png",
     "scheme": "meliponia",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "linking": {
-      "prefixes": [
-        "meliponia://"
-      ],
+      "prefixes": ["meliponia://"],
       "config": {
         "screens": {
           "(auth)": {
@@ -39,7 +37,8 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/icon.png",
-        "backgroundColor": "#F2A65A"
+        "backgroundColor": "#f7f9fc",
+        "monochromeImage": "./assets/images/icon.png"
       },
       "package": "com.apnunes.meliponia",
       "versionCode": 2,

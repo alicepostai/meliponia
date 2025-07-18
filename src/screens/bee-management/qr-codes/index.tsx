@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useState } from 'react';
-import { View, Text, FlatList, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
 import ViewShot from 'react-native-view-shot';
@@ -29,10 +29,10 @@ const FeedbackState = memo(
       return (
         <View style={styles.feedbackContainer}>
           <Text style={[styles.feedbackText, styles.errorText]}>Erro ao carregar colmeias.</Text>
-          <Pressable style={styles.retryButton} onPress={onRetry}>
+          <TouchableOpacity style={styles.retryButton} onPress={onRetry} activeOpacity={0.7}>
             <MaterialCommunityIcons name="reload" size={16} color={colors.white} />
             <Text style={styles.retryButtonText}>Tentar Novamente</Text>
-          </Pressable>
+          </TouchableOpacity>
         </View>
       );
     }
@@ -88,10 +88,14 @@ const QRCodeItem = memo(
             {isQrVisible ? (
               <QRCode value={qrData} size={100} color="black" backgroundColor="white" />
             ) : (
-              <Pressable style={styles.qrPlaceholder} onPress={() => setIsQrVisible(true)}>
+              <TouchableOpacity
+                style={styles.qrPlaceholder}
+                onPress={() => setIsQrVisible(true)}
+                activeOpacity={0.7}
+              >
                 <MaterialCommunityIcons name="qrcode" size={50} color={colors.secondary} />
                 <Text style={styles.qrPlaceholderText}>Gerar QR</Text>
-              </Pressable>
+              </TouchableOpacity>
             )}
           </View>
         </ViewShot>
@@ -99,31 +103,24 @@ const QRCodeItem = memo(
           <Text style={styles.hiveCodeText}>#{item.hiveCode || 'S/C'}</Text>
           <Text style={styles.speciesText}>{speciesName}</Text>
           <View style={styles.buttonsRow}>
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionButton,
-                { backgroundColor: colors.honey },
-                pressed && !isProcessing && { opacity: 0.7 },
-              ]}
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: colors.honey }]}
               onPress={() => handleAction(onShare)}
               disabled={isProcessing}
+              activeOpacity={isProcessing ? 1 : 0.7}
             >
               <MaterialCommunityIcons name="share-variant-outline" size={16} color={colors.white} />
               <Text style={styles.actionButtonText}>Compartilhar</Text>
-            </Pressable>
-            <Pressable
-              style={({ pressed }) => [
-                styles.actionButton,
-                styles.printButton,
-                { backgroundColor: colors.primary },
-                pressed && !isProcessing && { opacity: 0.7 },
-              ]}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.printButton, { backgroundColor: colors.primary }]}
               onPress={() => handleAction(onPrint)}
               disabled={isProcessing}
+              activeOpacity={isProcessing ? 1 : 0.7}
             >
               <MaterialCommunityIcons name="printer-outline" size={16} color={colors.white} />
               <Text style={styles.actionButtonText}>Imprimir</Text>
-            </Pressable>
+            </TouchableOpacity>
           </View>
         </View>
       </View>

@@ -2,12 +2,12 @@ import React from 'react';
 import { Stack, Redirect } from 'expo-router';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { ActivityIndicator, View, StyleSheet } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { fonts } from '@/theme/fonts';
 
 export default function AppLayout() {
   const { user, loading: authLoading } = useAuth();
-  const { colors: themeColors, isDarkMode } = useTheme();
+  const { colors: themeColors } = useTheme();
 
   if (authLoading) {
     return (
@@ -20,17 +20,6 @@ export default function AppLayout() {
   if (!user) {
     return <Redirect href="/(auth)/login" />;
   }
-
-  //TODO: Ajustar o estilo pra usar abaixo
-
-  const modalScreenOptions = {
-    presentation: 'modal' as const,
-    headerTitleStyle: {
-      color: themeColors.honey,
-      fontFamily: fonts.SemiBold,
-    },
-    headerTintColor: themeColors.honey,
-  };
 
   return (
     <Stack
@@ -119,7 +108,7 @@ export default function AppLayout() {
       />
 
       <Stack.Screen
-        name="hive/qr-scanner/index"
+        name="hive/qr-scanner"
         options={{
           presentation: 'modal',
           title: 'Escanear QR Code',

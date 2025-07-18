@@ -94,13 +94,13 @@ export const useQRCodesScreen = () => {
   const navigateToScanner = useCallback(() => {
     console.log('Navigating to QR scanner - useCallback triggered');
     try {
-      console.log('Attempting navigation to /(app)/hive/qr-scanner');
-      router.push('/(app)/hive/qr-scanner');
+      console.log('Attempting navigation to /hive/qr-scanner');
+      router.push('/hive/qr-scanner');
       console.log('Navigation push completed');
     } catch (error) {
       console.error('Navigation error:', error);
       try {
-        router.navigate('/(app)/hive/qr-scanner');
+        router.navigate('/hive/qr-scanner');
       } catch (fallbackError) {
         console.error('Fallback navigation error:', fallbackError);
       }
