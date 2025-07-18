@@ -38,7 +38,6 @@ export const PermissionProvider: React.FC<PermissionProviderProps> = ({ children
     setHasShownInitialModal(true);
   }, []);
 
-  // Mostrar modal de permissões na primeira vez
   React.useEffect(() => {
     if (!hasShownInitialModal && !permissions.status.loading) {
       if (!permissions.status.allGranted) {

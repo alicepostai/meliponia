@@ -136,7 +136,7 @@ const HiveScreen = memo(() => {
             hive ? (
               <TouchableOpacity
                 onPress={() => {
-                  console.log('Header menu button pressed'); // Debug log
+                  console.log('Header menu button pressed');
                   openHeaderMenu();
                 }}
                 style={styles.headerMenuButton}

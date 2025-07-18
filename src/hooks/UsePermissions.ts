@@ -44,13 +44,11 @@ export const usePermissions = () => {
     try {
       console.log('Requesting all permissions...');
 
-      // Solicitar permissão da câmera
       if (!cameraPermission?.granted) {
         console.log('Requesting camera permission...');
         await requestCameraPermission();
       }
 
-      // Solicitar permissão de localização
       if (!locationPermission?.granted) {
         console.log('Requesting location permission...');
         await requestLocationPermission();
@@ -78,7 +76,6 @@ export const usePermissions = () => {
     setLoading(true);
 
     try {
-      // Verificar permissão de localização
       await checkLocationPermission();
     } catch (error) {
       console.error('Error checking permissions:', error);
@@ -87,7 +84,6 @@ export const usePermissions = () => {
     }
   }, [checkLocationPermission]);
 
-  // Verificar permissões na inicialização
   useEffect(() => {
     checkAllPermissions();
   }, [checkAllPermissions]);

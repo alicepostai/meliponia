@@ -22,7 +22,7 @@ const processHiveDataForList = (hives: DbHive[] | null): ProcessedHiveListItem[]
       origin: hive.hive_origin,
       acquisitionDate: hive.acquisition_date,
       hiveCode: hive.hive_code,
-      imageUrl: hive.image_url || getBeeImageUrlById(hive.bee_species_id), // Usar imagem customizada se disponível
+      imageUrl: hive.image_url || getBeeImageUrlById(hive.bee_species_id),
       status: hive.status ?? 'Ativo',
       isPending: hive.id.startsWith('offline_'),
     }))
