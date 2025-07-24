@@ -8,6 +8,8 @@ import React, {
   useCallback,
 } from 'react';
 import { authService } from '@/services/AuthService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 import { User, Session } from '@/types/supabase';
 import { logger } from '@/utils/logger';
 export interface AuthContextType {
@@ -32,24 +34,56 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           return;
         }
 
+        const netState = await NetInfo.fetch().catch(() => ({ isConnected: false, isInternetReachable: false }));
+        
+        if (!netState.isConnected || !netState.isInternetReachable) {
+          const cachedSession = await AsyncStorage.getItem('cached_session');
+          if (cachedSession) {
+            const session = JSON.parse(cachedSession);
+            setSession(session);
+            setUser(session.user);
+            logger.debug('AuthContext - Sessão offline carregada do cache');
+          }
+          setLoading(false);
+          return;
+        }
+
         const { data, error } = await authService.getCurrentSession();
         if (error) throw error;
 
-        logger.debug('AuthContext - Sessão inicial carregada:', {
+        logger.debug('AuthContext - Sessão online carregada:', {
           hasSession: !!data?.session,
           hasUser: !!data?.session?.user,
         });
 
         setSession(data?.session ?? null);
         setUser(data?.session?.user ?? null);
+        
+        if (data?.session) {
+          await AsyncStorage.setItem('cached_session', JSON.stringify(data.session));
+        }
       } catch (err) {
         logger.error('Auth Context: Erro ao buscar sessão inicial:', err);
+        const cachedSession = await AsyncStorage.getItem('cached_session');
+        if (cachedSession) {
+          const session = JSON.parse(cachedSession);
+          setSession(session);
+          setUser(session.user);
+          logger.debug('AuthContext - Fallback para sessão cached após erro');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchInitialSession();
+
+    const timeoutId = setTimeout(() => {
+      if (loading) {
+        logger.warn('AuthContext - Timeout na inicialização, forçando saída do loading');
+        setLoading(false);
+      }
+    }, 10000);
 
     if (typeof window !== 'undefined') {
       const authListener = authService.onAuthStateChange((event, currentSession) => {
@@ -65,6 +99,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       });
 
       return () => {
+        clearTimeout(timeoutId);
         authListener?.unsubscribe();
       };
     }

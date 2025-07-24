@@ -2,6 +2,8 @@ import { supabase } from './supabase';
 import { AuthError, Session, User } from '@/types/supabase';
 import { AlertService } from './AlertService';
 import { logger } from '@/utils/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
 
 interface AuthResponse {
   data: { session: Session | null; user: User | null } | null;
@@ -116,9 +118,11 @@ export const authService = {
   signOut: async (): Promise<{ error: AuthError | null }> => {
     try {
       const { error } = await supabase.auth.signOut();
+      await AsyncStorage.removeItem('cached_session');
       if (error) throw error;
       return { error: null };
     } catch (error) {
+      await AsyncStorage.removeItem('cached_session');
       return { error: handleAuthError(error, 'signOut').error };
     }
   },
@@ -130,14 +134,38 @@ export const authService = {
     return { data: { user }, error };
   },
   getCurrentSession: async (): Promise<AuthResponse> => {
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.getSession();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    return { data: { session, user }, error };
+    try {
+      const netState = await NetInfo.fetch().catch(() => ({ isConnected: false, isInternetReachable: false }));
+      
+      if (!netState.isConnected || !netState.isInternetReachable) {
+        const cached = await AsyncStorage.getItem('cached_session');
+        if (cached) {
+          const session = JSON.parse(cached);
+          return { data: { session, user: session.user }, error: null };
+        }
+        return { data: { session: null, user: null }, error: null };
+      }
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (session) {
+        await AsyncStorage.setItem('cached_session', JSON.stringify(session));
+      }
+      
+      return { data: { session, user }, error };
+    } catch (error) {
+      const cached = await AsyncStorage.getItem('cached_session');
+      if (cached) {
+        const session = JSON.parse(cached);
+        return { data: { session, user: session.user }, error: null };
+      }
+      return { data: { session: null, user: null }, error: error as AuthError };
+    }
   },
   onAuthStateChange: (callback: (event: string, session: Session | null) => void) => {
     const { data: listener } = supabase.auth.onAuthStateChange(callback);
