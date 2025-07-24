@@ -24,7 +24,7 @@ const DivisionSchema = Yup.object().shape({
     .required('Data é obrigatória')
     .max(getEndOfToday(), 'Data não pode ser futura'),
   motherHive1: Yup.object().nullable().required('Pelo menos uma matriz é obrigatória'),
-  newHiveCode: Yup.string().trim().required('Código do novo enxame é obrigatório'),
+  newHiveCode: Yup.string().trim().required('Código da nova colmeia é obrigatório'),
   newHiveBoxType: Yup.object().nullable().required('Tipo de caixa é obrigatório'),
 });
 
@@ -94,7 +94,7 @@ const MotherHiveSelector = memo(
           ListEmptyComponent={() => (
             <View style={styles.emptyListContainer}>
               <Text style={styles.emptyListText}>
-                Nenhum enxame ativo desta espécie disponível.
+                Nenhuma colmeia ativa desta espécie disponível.
               </Text>
             </View>
           )}
@@ -128,7 +128,7 @@ const HiveDivisionScreen = memo(() => {
   return (
     <>
       <ScreenWrapper scrollable>
-        <Stack.Screen options={{ title: 'Divisão de Enxame' }} />
+        <Stack.Screen options={{ title: 'Divisão de Colmeia' }} />
         <Formik<HiveDivisionFormValues>
           innerRef={formikRef}
           initialValues={{
@@ -197,11 +197,11 @@ const HiveDivisionScreen = memo(() => {
                 </View>
               </View>
               <View style={styles.formSection}>
-                <Text style={styles.sectionTitle}>Dados do Novo Enxame</Text>
+                <Text style={styles.sectionTitle}>Dados da Nova Colmeia</Text>
                 <View style={styles.fieldsGroupContainer}>
                   <View style={styles.fieldWrapper}>
                     <InputField
-                      label="Código do Novo Enxame"
+                      label="Código da Nova Colmeia"
                       iconName="barcode-scan"
                       placeholder="Ex: CX-010"
                       value={values.newHiveCode}
@@ -267,7 +267,7 @@ const HiveDivisionScreen = memo(() => {
                 </View>
               </View>
               <MainButton
-                title="Criar Novo Enxame"
+                title="Criar Nova Colmeia"
                 onPress={() => handleSubmit()}
                 loading={isSubmitting || formikProps.isSubmitting}
                 disabled={isSubmitting || formikProps.isSubmitting}

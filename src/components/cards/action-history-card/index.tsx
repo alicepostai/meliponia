@@ -80,7 +80,7 @@ const ActionDetailComponents: { [key: string]: React.FC<ActionDetailsProps> } = 
   Alimentação: FeedingDetails,
   Manejo: MaintenanceDetails,
   Transferência: TransferDetails,
-  'Divisão de Enxame': DivisionDetails,
+  'Divisão de Colmeia': DivisionDetails,
   'Divisão Origem': DivisionDetails,
 };
 

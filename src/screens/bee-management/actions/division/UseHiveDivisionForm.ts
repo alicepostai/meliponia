@@ -8,6 +8,7 @@ import { actionService } from '@/services/ActionService';
 import { hiveService } from '@/services/HiveService';
 import { BoxType } from '@/types/ConstantsTypes';
 import { DbHive } from '@/types/supabase';
+import { logger } from '@/utils/logger';
 export interface HiveDivisionFormValues {
   actionDate: Date | null;
   motherHive1: DbHive | null;
@@ -89,7 +90,7 @@ export const useHiveDivisionForm = () => {
       formikRef.current?.setFieldValue('latitude', location.coords.latitude);
       formikRef.current?.setFieldValue('longitude', location.coords.longitude);
     } catch (error) {
-      console.error('Erro ao obter localização:', error);
+      logger.error('Erro ao obter localização:', error);
       Alert.alert('Erro', 'Não foi possível obter sua localização atual.');
     } finally {
       setIsGettingLocation(false);
@@ -106,20 +107,20 @@ export const useHiveDivisionForm = () => {
 
   const handleLocationSelected = useCallback(
     (location: { latitude: number; longitude: number }) => {
-      console.log('HiveDivisionForm: Received location from modal:', location);
+      logger.debug('HiveDivisionForm: Received location from modal:', location);
       const formik = formikRef.current;
       if (formik) {
         formik.setFieldValue('latitude', location.latitude);
         formik.setFieldValue('longitude', location.longitude);
         formik.setFieldTouched('latitude', true);
         formik.setFieldTouched('longitude', true);
-        console.log(
+        logger.debug(
           'HiveDivisionForm: Set form values - latitude:',
           location.latitude,
           'longitude:',
           location.longitude,
         );
-        console.log('HiveDivisionForm: Current form values after update:', formik.values);
+        logger.debug('HiveDivisionForm: Current form values after update:', formik.values);
       }
       closeLocationPicker();
     },

@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useIsFocused } from '@react-navigation/native';
 import { useOnboarding } from '@/contexts/OnboardingContext';
 import { onboardingService } from '@/services/OnboardingService';
+import { logger } from '@/utils/logger';
 
 interface TutorialStep {
   id: string;
@@ -41,7 +42,7 @@ export const useTutorial = (options: UseTutorialOptions) => {
   }, [tutorialKey]);
 
   useEffect(() => {
-    console.log(`UseTutorial [${tutorialKey}] - Status:`, {
+    logger.debug(`UseTutorial [${tutorialKey}] - Status:`, {
       autoStart,
       isFocused,
       hasSeenOnboarding: onboardingStatus.hasSeenOnboarding,
@@ -54,9 +55,9 @@ export const useTutorial = (options: UseTutorialOptions) => {
       autoStart && isFocused && onboardingStatus.hasSeenOnboarding && !hasSeenThisTutorial;
 
     if (shouldShow) {
-      console.log(`UseTutorial [${tutorialKey}] - Iniciando timer para tutorial`);
+      logger.debug(`UseTutorial [${tutorialKey}] - Iniciando timer para tutorial`);
       const timer = setTimeout(() => {
-        console.log(`UseTutorial [${tutorialKey}] - Timer ativado, iniciando tutorial`);
+        logger.debug(`UseTutorial [${tutorialKey}] - Timer ativado, iniciando tutorial`);
         setShouldStart(true);
       }, delay);
 
@@ -66,7 +67,7 @@ export const useTutorial = (options: UseTutorialOptions) => {
 
   useEffect(() => {
     if (shouldStart && isFocused) {
-      console.log(`UseTutorial [${tutorialKey}] - shouldStart true, exibindo tutorial`);
+      logger.debug(`UseTutorial [${tutorialKey}] - shouldStart true, exibindo tutorial`);
       setIsVisible(true);
       setShouldStart(false);
     }
@@ -74,7 +75,7 @@ export const useTutorial = (options: UseTutorialOptions) => {
 
   useEffect(() => {
     if (!isFocused && isVisible) {
-      console.log(`UseTutorial [${tutorialKey}] - Tela perdeu foco, escondendo tutorial`);
+      logger.debug(`UseTutorial [${tutorialKey}] - Tela perdeu foco, escondendo tutorial`);
       setIsVisible(false);
     }
   }, [isFocused, isVisible, tutorialKey]);
@@ -84,14 +85,14 @@ export const useTutorial = (options: UseTutorialOptions) => {
   }, []);
 
   const completeTutorial = useCallback(async () => {
-    console.log(`UseTutorial [${tutorialKey}] - Completando tutorial`);
+    logger.info(`UseTutorial [${tutorialKey}] - Completando tutorial`);
     setIsVisible(false);
     await onboardingService.markSpecificTutorialSeen(tutorialKey);
     setHasSeenThisTutorial(true);
   }, [tutorialKey]);
 
   const skipTutorial = useCallback(async () => {
-    console.log(`UseTutorial [${tutorialKey}] - Pulando tutorial`);
+    logger.info(`UseTutorial [${tutorialKey}] - Pulando tutorial`);
     setIsVisible(false);
     await onboardingService.markSpecificTutorialSeen(tutorialKey);
     setHasSeenThisTutorial(true);

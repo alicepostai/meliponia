@@ -3,13 +3,17 @@ import { DbProfile, PostgrestError } from '@/types/supabase';
 import { Alert } from 'react-native';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 const handleProfileError = (
   error: unknown,
   context: string,
 ): { data: null; error: PostgrestError } => {
   const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
-  console.error(`Error during ProfileService ${context}:`, error);
-  Alert.alert(`Erro de Perfil - ${context}`, errorMessage);
+  logger.error(`Error during ProfileService ${context}:`, error);
+  AlertService.showError(errorMessage, {
+    title: `Erro de Perfil - ${context}`
+  });
   return {
     data: null,
     error: {
@@ -26,7 +30,7 @@ export const profileService = {
     try {
       const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
       if (error && error.code === 'PGRST116') {
-        console.log(`Perfil para usuário ${userId} não encontrado, criando um novo.`);
+        logger.info(`Perfil para usuário ${userId} não encontrado, criando um novo.`);
         const { data: newProfile, error: creationError } = await supabase
           .from('profiles')
           .insert({ id: userId, updated_at: new Date().toISOString() })
@@ -61,12 +65,14 @@ export const profileService = {
           createdAt: Date.now(),
         });
         await AsyncStorage.setItem(offlineKey, JSON.stringify(updates));
-        Alert.alert(
-          'Modo Offline',
+        AlertService.showError(
           'Você está sem conexão. Suas alterações foram salvas e serão enviadas assim que a internet voltar.',
+          {
+            title: 'Modo Offline'
+          }
         );
       } catch (storageError) {
-        console.error('Erro ao salvar perfil offline:', storageError);
+        logger.error('Erro ao salvar perfil offline:', storageError);
       }
       return {
         data: null,
@@ -99,7 +105,7 @@ export const profileService = {
       if (!existingUpdates) return;
       const updates = JSON.parse(existingUpdates);
       if (updates.length === 0) return;
-      console.log(
+      logger.info(
         `ProfileService: Sincronizando ${updates.length} atualizações de perfil offline.`,
       );
       const remainingUpdates = [];
@@ -112,32 +118,29 @@ export const profileService = {
           };
           const { error } = await supabase.from('profiles').upsert(profileUpdates);
           if (error) {
-            console.error('Erro ao sincronizar perfil:', error);
+            logger.error('Erro ao sincronizar perfil:', error);
             remainingUpdates.push(update);
           }
         } catch (error) {
-          console.error('Erro ao processar atualização de perfil offline:', error);
+          logger.error('Erro ao processar atualização de perfil offline:', error);
           remainingUpdates.push(update);
         }
       }
       await AsyncStorage.setItem(offlineKey, JSON.stringify(remainingUpdates));
       if (remainingUpdates.length === 0) {
-        console.log('ProfileService: Todas as atualizações de perfil foram sincronizadas.');
+        logger.info('ProfileService: Todas as atualizações de perfil foram sincronizadas.');
       } else {
-        console.warn(`ProfileService: ${remainingUpdates.length} atualizações de perfil falharam.`);
+        logger.warn(`ProfileService: ${remainingUpdates.length} atualizações de perfil falharam.`);
       }
     } catch (error) {
-      console.error('ProfileService: Erro ao sincronizar perfis offline:', error);
+      logger.error('ProfileService: Erro ao sincronizar perfis offline:', error);
     }
   },
 
   deleteAccount: async (userId: string): Promise<{ success: boolean; error: string | null }> => {
     const netState = await NetInfo.fetch();
     if (!netState.isConnected || !netState.isInternetReachable) {
-      Alert.alert(
-        'Sem Conexão',
-        'Você precisa estar conectado à internet para excluir sua conta. Tente novamente quando estiver online.',
-      );
+      AlertService.showNetworkError();
       return { success: false, error: 'Sem conexão com a internet' };
     }
 
@@ -170,7 +173,7 @@ export const profileService = {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : 'Erro desconhecido ao excluir conta.';
-      console.error('Erro ao excluir conta:', error);
+      logger.error('Erro ao excluir conta:', error);
       return { success: false, error: errorMessage };
     }
   },

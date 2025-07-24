@@ -10,6 +10,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Appearance } from 'react-native';
 import { palettes, AppColorPalette, lightColors } from '@/theme/colors';
+import { logger } from '@/utils/logger';
 type ThemeMode = 'light' | 'dark' | 'system';
 interface ThemeContextType {
   theme: ThemeMode;
@@ -35,7 +36,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
           setThemeState(storedTheme);
         }
       } catch (e) {
-        console.error('ThemeContext: Falha ao carregar preferência de tema.', e);
+        logger.error('ThemeContext: Falha ao carregar preferência de tema.', e);
       }
     };
     loadThemePreference();
@@ -60,7 +61,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
       await AsyncStorage.setItem(ASYNC_STORAGE_THEME_KEY, newTheme);
       setThemeState(newTheme);
     } catch (e) {
-      console.error('ThemeContext: Falha ao salvar preferência de tema.', e);
+      logger.error('ThemeContext: Falha ao salvar preferência de tema.', e);
     }
   }, []);
   const handleToggleTheme = useCallback(() => {

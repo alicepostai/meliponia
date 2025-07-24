@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+import { logger } from '@/utils/logger';
 
 const ONBOARDING_KEY = '@meliponia_onboarding_completed';
 const TUTORIAL_SEEN_KEY = '@meliponia_tutorial_seen';
@@ -26,7 +27,7 @@ export const onboardingService = {
       const value = await AsyncStorage.getItem(ONBOARDING_KEY);
       return value === 'true';
     } catch (error) {
-      console.error('Erro ao verificar onboarding:', error);
+      logger.error('Erro ao verificar onboarding:', error);
       return false;
     }
   },
@@ -36,7 +37,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
     } catch (error) {
-      console.error('Erro ao marcar onboarding como concluído:', error);
+      logger.error('Erro ao marcar onboarding como concluído:', error);
     }
   },
 
@@ -46,7 +47,7 @@ export const onboardingService = {
       const value = await AsyncStorage.getItem(TUTORIAL_SEEN_KEY);
       return value === 'true';
     } catch (error) {
-      console.error('Erro ao verificar tutorial:', error);
+      logger.error('Erro ao verificar tutorial:', error);
       return false;
     }
   },
@@ -56,7 +57,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
     } catch (error) {
-      console.error('Erro ao marcar tutorial como visto:', error);
+      logger.error('Erro ao marcar tutorial como visto:', error);
     }
   },
 
@@ -66,7 +67,7 @@ export const onboardingService = {
       const value = await AsyncStorage.getItem(getTutorialKey(tutorialId));
       return value === 'true';
     } catch (error) {
-      console.error(`Erro ao verificar tutorial ${tutorialId}:`, error);
+      logger.error(`Erro ao verificar tutorial ${tutorialId}:`, error);
       return false;
     }
   },
@@ -76,7 +77,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.setItem(getTutorialKey(tutorialId), 'true');
     } catch (error) {
-      console.error(`Erro ao marcar tutorial ${tutorialId} como visto:`, error);
+      logger.error(`Erro ao marcar tutorial ${tutorialId} como visto:`, error);
     }
   },
 
@@ -85,7 +86,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.removeItem(getTutorialKey(tutorialId));
     } catch (error) {
-      console.error(`Erro ao resetar tutorial ${tutorialId}:`, error);
+      logger.error(`Erro ao resetar tutorial ${tutorialId}:`, error);
     }
   },
 
@@ -94,7 +95,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.removeItem(TUTORIAL_SEEN_KEY);
     } catch (error) {
-      console.error('Erro ao resetar tutorial:', error);
+      logger.error('Erro ao resetar tutorial:', error);
     }
   },
 
@@ -103,7 +104,7 @@ export const onboardingService = {
       if (!isAsyncStorageAvailable()) return;
       await AsyncStorage.multiRemove([ONBOARDING_KEY, TUTORIAL_SEEN_KEY]);
     } catch (error) {
-      console.error('Erro ao resetar onboarding:', error);
+      logger.error('Erro ao resetar onboarding:', error);
     }
   },
 
@@ -126,7 +127,7 @@ export const onboardingService = {
         hasSeenTutorial,
       };
     } catch (error) {
-      console.error('Erro ao obter status do onboarding:', error);
+      logger.error('Erro ao obter status do onboarding:', error);
       return {
         hasSeenOnboarding: false,
         hasSeenTutorial: false,

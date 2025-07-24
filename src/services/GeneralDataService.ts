@@ -2,13 +2,17 @@ import { supabase } from './supabase';
 import { PostgrestError } from '@/types/supabase';
 import { AggregatedData } from '@/types/DataTypes';
 import { Alert } from 'react-native';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 const handleDataError = (
   error: unknown,
   context: string,
 ): { data: null; error: PostgrestError } => {
   const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
-  console.error(`Error during ${context}:`, error);
-  Alert.alert(`Erro - ${context}`, errorMessage);
+  logger.error(`Error during ${context}:`, error);
+  AlertService.showError(errorMessage, {
+    title: `Erro - ${context}`
+  });
   return {
     data: null,
     error: {
@@ -27,7 +31,7 @@ const fetchCount = async (fromTable: string, filter: Record<string, any> = {}): 
   });
   const { count, error } = await query;
   if (error) {
-    console.warn(`Error counting ${fromTable}:`, error.message);
+    logger.warn(`Error counting ${fromTable}:`, error.message);
     return 0;
   }
   return count ?? 0;
@@ -82,7 +86,7 @@ export const generalDataService = {
         fetchCount('hive_action', { user_id: userId, action_type: 'Alimentação' }),
         fetchCount('hive_action', { user_id: userId, action_type: 'Colheita' }),
         fetchCount('hive_action', { user_id: userId, action_type: 'Manejo' }),
-        fetchCount('hive_action', { user_id: userId, action_type: 'Divisão de Enxame' }),
+        fetchCount('hive_action', { user_id: userId, action_type: 'Divisão de Colmeia' }),
       ]);
       if (speciesDataRes.error) throw speciesDataRes.error;
       if (honeyDataRes.error) throw honeyDataRes.error;

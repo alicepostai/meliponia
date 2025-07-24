@@ -10,6 +10,8 @@ import UnifiedMapComponent, {
   BeeMarker,
   UnifiedMapComponentRef,
 } from '@/components/maps/UnifiedMapComponent';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 interface Region {
   latitude: number;
@@ -50,9 +52,11 @@ const LocationPickerModal = memo(
       try {
         const { status } = await Location.requestForegroundPermissionsAsync();
         if (status !== 'granted') {
-          Alert.alert(
-            'Permissão Negada',
+          AlertService.showError(
             'Permissão de localização é necessária para esta funcionalidade.',
+            {
+              title: 'Permissão Negada'
+            }
           );
           return;
         }
@@ -66,8 +70,8 @@ const LocationPickerModal = memo(
         setSelectedLocation(coords);
         animateToRegion(coords);
       } catch (error) {
-        console.error('LocationPickerModal: Erro ao obter localização', error);
-        Alert.alert('Erro', 'Não foi possível obter sua localização atual.');
+        logger.error('LocationPickerModal: Erro ao obter localização', error);
+        AlertService.showError('Não foi possível obter sua localização atual.');
       } finally {
         setIsLoadingLocation(false);
       }
@@ -90,23 +94,20 @@ const LocationPickerModal = memo(
     }, [isVisible, initialCoordinates, animateToRegion]);
 
     const handleMapPress = useCallback((coordinate: { latitude: number; longitude: number }) => {
-      console.log('LocationPickerModal: Map pressed with coordinate:', coordinate);
+      logger.debug('LocationPickerModal: Map pressed with coordinate:', coordinate);
       setSelectedLocation(coordinate);
     }, []);
 
     const handleConfirmLocation = useCallback(() => {
-      console.log('LocationPickerModal: Confirming location:', selectedLocation);
+      logger.debug('LocationPickerModal: Confirming location:', selectedLocation);
       if (selectedLocation) {
-        console.log('LocationPickerModal: Calling onLocationSelect with:', selectedLocation);
+        logger.debug('LocationPickerModal: Calling onLocationSelect with:', selectedLocation);
         onLocationSelect(selectedLocation);
         setTimeout(() => {
           onClose();
         }, 100);
       } else {
-        Alert.alert(
-          'Nenhum Local Selecionado',
-          'Por favor, toque no mapa para selecionar um local.',
-        );
+        AlertService.showValidationError('Por favor, toque no mapa para selecionar um local.');
       }
     }, [selectedLocation, onLocationSelect, onClose]);
 

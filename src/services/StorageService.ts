@@ -3,9 +3,50 @@ import { Alert } from 'react-native';
 import { Asset } from 'react-native-image-picker';
 import NetInfo from '@react-native-community/netinfo';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 
 export const HIVE_IMAGES_BUCKET_NAME = 'hive-images';
 export const AVATARS_BUCKET_NAME = 'avatars';
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/jpg', 
+  'image/png',
+  'image/webp'
+];
+
+const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
+
+const validateImageFile = (imageAsset: Asset): { isValid: boolean; error?: string } => {
+  if (imageAsset.fileSize && imageAsset.fileSize > MAX_FILE_SIZE) {
+    return {
+      isValid: false, 
+      error: `Arquivo muito grande. Tamanho máximo permitido: ${MAX_FILE_SIZE / (1024 * 1024)}MB`
+    };
+  }
+
+  if (imageAsset.type && !ALLOWED_MIME_TYPES.includes(imageAsset.type.toLowerCase())) {
+    return {
+      isValid: false,
+      error: `Tipo de arquivo não permitido. Tipos aceitos: ${ALLOWED_MIME_TYPES.join(', ')}`
+    };
+  }
+
+  if (imageAsset.fileName) {
+    const extension = getFileExtension(imageAsset.fileName);
+    if (!ALLOWED_EXTENSIONS.includes(extension)) {
+      return {
+        isValid: false,
+        error: `Extensão de arquivo não permitida. Extensões aceitas: ${ALLOWED_EXTENSIONS.join(', ')}`
+      };
+    }
+  }
+
+  return { isValid: true };
+};
 
 interface UploadResult {
   success: boolean;
@@ -28,17 +69,15 @@ const handleStorageError = (error: unknown, context: string): UploadResult => {
       errorDetails += ` Dica: ${error.hint}`;
     }
 
-    console.error(`StorageService: Erro detalhado durante ${context}:`, {
-      error,
+    logger.error(`StorageService.${context}: Detailed error:`, {
       message: errorMessage,
       details: errorDetails,
-      stack: error instanceof Error ? error.stack : 'No stack trace',
     });
   } else if (error instanceof Error) {
     errorMessage = error.message;
-    console.error(`StorageService: Error durante ${context}:`, error.message, error.stack);
+    logger.error(`StorageService.${context}: Error occurred:`, error.message);
   } else {
-    console.error(`StorageService: Erro desconhecido durante ${context}:`, error);
+    logger.error(`StorageService.${context}: Unknown error occurred:`, error);
   }
 
   return {
@@ -58,8 +97,16 @@ export const uploadImageToStorage = async (
 ): Promise<UploadResult> => {
   if (!imageAsset.uri || !imageAsset.type) {
     return handleStorageError(
-      new Error('Dados do asset de imagem inválidos.'),
-      'validação de asset',
+      new Error('Invalid image asset data'),
+      'uploadImageToStorage',
+    );
+  }
+
+  const validation = validateImageFile(imageAsset);
+  if (!validation.isValid) {
+    return handleStorageError(
+      new Error(validation.error || 'Invalid file'),
+      'uploadImageToStorage'
     );
   }
 
@@ -81,9 +128,11 @@ export const uploadImageToStorage = async (
         createdAt: Date.now(),
       });
       await AsyncStorage.setItem(offlineKey, JSON.stringify(uploads));
-      Alert.alert(
-        'Modo Offline',
+      AlertService.showError(
         'Você está sem conexão. A imagem foi salva e será enviada assim que a internet voltar.',
+        {
+          title: 'Modo Offline'
+        }
       );
       return {
         success: false,
@@ -93,20 +142,20 @@ export const uploadImageToStorage = async (
         },
       };
     } catch (storageError) {
-      console.error('Erro ao salvar upload offline:', storageError);
-      return handleStorageError(storageError, 'salvamento offline');
+      logger.error('StorageService.uploadImageToStorage: Failed to save offline upload:', storageError);
+      return handleStorageError(storageError, 'uploadImageToStorage');
     }
   }
 
   try {
-    console.log(
-      `StorageService: Iniciando upload para BUCKET: ${bucketName}, CAMINHO: ${filePath}`,
+    logger.info(
+      `StorageService.uploadImageToStorage: Starting upload to BUCKET: ${bucketName}, PATH: ${filePath}`,
     );
 
     const bucketExists = await ensureBucketExists(bucketName);
     if (!bucketExists) {
       throw new Error(
-        `Bucket '${bucketName}' não existe e não foi possível criá-lo. Verifique as permissões ou crie-o manualmente no painel do Supabase.`,
+        `StorageService.uploadImageToStorage: Bucket '${bucketName}' does not exist and could not be created - check permissions or create manually`,
       );
     }
 
@@ -127,20 +176,20 @@ export const uploadImageToStorage = async (
 
     if (uploadError) throw uploadError;
 
-    console.log(`StorageService: Upload bem-sucedido:`, uploadData);
+    logger.info(`StorageService.uploadImageToStorage: Upload successful for ${filePath}`);
 
     const { data: urlData } = supabase.storage.from(bucketName).getPublicUrl(filePath);
     if (!urlData?.publicUrl) {
-      console.warn(
-        `StorageService: Não foi possível obter URL pública para ${filePath} após upload.`,
+      logger.warn(
+        `StorageService.uploadImageToStorage: Could not get public URL for ${filePath} after upload`,
       );
-      return { success: true, publicUrl: null, error: new Error('URL pública não encontrada.') };
+      return { success: true, publicUrl: null, error: new Error('StorageService.uploadImageToStorage: Public URL not found') };
     }
 
-    console.log(`StorageService: URL Pública obtida:`, urlData.publicUrl);
+    logger.debug(`StorageService.uploadImageToStorage: Public URL obtained for ${filePath}`);
     return { success: true, publicUrl: urlData.publicUrl };
   } catch (error) {
-    return handleStorageError(error, `upload para ${bucketName}`);
+    return handleStorageError(error, 'uploadImageToStorage');
   }
 };
 
@@ -151,7 +200,8 @@ const getFileExtension = (fileName: string): string => {
 
 export const createHiveImageFilePath = (hiveId: string, fileName: string): string => {
   const extension = getFileExtension(fileName);
-  return `public/hives/${hiveId}/${Date.now()}.${extension}`;
+  const randomId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  return `public/hives/${hiveId}/${randomId}.${extension}`;
 };
 
 export const createAvatarFilePath = (userId: string, fileName: string): string => {
@@ -166,7 +216,7 @@ export const syncOfflineUploads = async (): Promise<void> => {
     if (!existingUploads) return;
     const uploads = JSON.parse(existingUploads);
     if (uploads.length === 0) return;
-    console.log(`StorageService: Sincronizando ${uploads.length} uploads offline.`);
+    logger.info(`StorageService.syncOfflineUploads: Syncing ${uploads.length} offline uploads`);
     const remainingUploads = [];
     for (const upload of uploads) {
       try {
@@ -185,24 +235,24 @@ export const syncOfflineUploads = async (): Promise<void> => {
             contentType: imageAsset.type,
           });
         if (uploadError) {
-          console.error('Erro ao sincronizar upload:', uploadError);
+          logger.error('StorageService.syncOfflineUploads: Failed to sync upload:', uploadError);
           remainingUploads.push(upload);
         } else {
-          console.log(`StorageService: Upload sincronizado: ${filePath}`);
+          logger.info(`StorageService.syncOfflineUploads: Upload synced: ${filePath}`);
         }
       } catch (error) {
-        console.error('Erro ao processar upload offline:', error);
+        logger.error('StorageService.syncOfflineUploads: Failed to process offline upload:', error);
         remainingUploads.push(upload);
       }
     }
     await AsyncStorage.setItem(offlineKey, JSON.stringify(remainingUploads));
     if (remainingUploads.length === 0) {
-      console.log('StorageService: Todos os uploads foram sincronizados.');
+      logger.info('StorageService.syncOfflineUploads: All uploads synced successfully');
     } else {
-      console.warn(`StorageService: ${remainingUploads.length} uploads falharam.`);
+      logger.warn(`StorageService.syncOfflineUploads: ${remainingUploads.length} uploads failed`);
     }
   } catch (error) {
-    console.error('StorageService: Erro ao sincronizar uploads offline:', error);
+    logger.error('StorageService.syncOfflineUploads: Error syncing offline uploads:', error);
   }
 };
 
@@ -214,7 +264,7 @@ export const ensureBucketExists = async (bucketName: string): Promise<boolean> =
       error &&
       (error.message.includes('not found') || error.message.includes('does not exist'))
     ) {
-      console.log(`StorageService: Bucket '${bucketName}' não existe. Tentando criar...`);
+      logger.info(`StorageService.ensureBucketExists: Bucket '${bucketName}' does not exist - attempting to create`);
 
       const { error: createError } = await supabase.storage.createBucket(bucketName, {
         public: true,
@@ -223,20 +273,20 @@ export const ensureBucketExists = async (bucketName: string): Promise<boolean> =
       });
 
       if (createError) {
-        console.error(`StorageService: Erro ao criar bucket '${bucketName}':`, createError);
+        logger.error(`StorageService.ensureBucketExists: Failed to create bucket '${bucketName}':`, createError);
         return false;
       }
 
-      console.log(`StorageService: Bucket '${bucketName}' criado com sucesso!`);
+      logger.info(`StorageService.ensureBucketExists: Bucket '${bucketName}' created successfully`);
       return true;
     } else if (error) {
-      console.error(`StorageService: Erro ao verificar bucket '${bucketName}':`, error);
+      logger.error(`StorageService.ensureBucketExists: Failed to verify bucket '${bucketName}':`, error);
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(`StorageService: Erro inesperado ao verificar bucket '${bucketName}':`, error);
+    logger.error(`StorageService.ensureBucketExists: Unexpected error verifying bucket '${bucketName}':`, error);
     return false;
   }
 };

@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { hiveService } from '@/services/HiveService';
 import { DbHive } from '@/types/supabase';
 import { UnifiedMapComponentRef } from '@/components/maps/UnifiedMapComponent';
+import { logger } from '@/utils/logger';
 
 interface Region {
   latitude: number;
@@ -79,9 +80,9 @@ export const useMapScreen = () => {
         centerMapOn(userCoords);
       }
 
-      console.log('🗺️ User location obtained:', userCoords);
+      logger.info('🗺️ User location obtained:', userCoords);
     } catch (error) {
-      console.error('Error getting user location:', error);
+      logger.error('Error getting user location:', error);
     } finally {
       setLoading(false);
     }
@@ -91,8 +92,8 @@ export const useMapScreen = () => {
     setLoading(true);
     const { data } = await hiveService.fetchHivesByUserId(user.id, 'Ativas');
     if (data) {
-      console.log('🐝 Total de colmeias encontradas:', data.length);
-      console.log(
+      logger.info('🐝 Total de colmeias encontradas:', data.length);
+      logger.info(
         '🐝 Colmeias com coordenadas:',
         data.filter(h => h.latitude != null && h.longitude != null).length,
       );
@@ -102,7 +103,7 @@ export const useMapScreen = () => {
           h.latitude != null && h.longitude != null,
       );
 
-      console.log('🐝 Colmeias filtradas para o mapa:', hivesWithCoords);
+      logger.info('🐝 Colmeias filtradas para o mapa:', hivesWithCoords);
 
       setHives(hivesWithCoords);
       if (!userLocation && hivesWithCoords.length > 0 && mapReady) {
@@ -115,14 +116,14 @@ export const useMapScreen = () => {
   useFocusEffect(
     useCallback(() => {
       const initializeMap = async () => {
-        console.log('🗺️ Initializing map screen');
+        logger.debug('🗺️ Initializing map screen');
         const hasPermission = await requestLocationPermission(false);
-        console.log('🗺️ Permission status:', hasPermission ? 'granted' : 'denied');
+        logger.debug('🗺️ Permission status:', hasPermission ? 'granted' : 'denied');
         if (hasPermission) {
-          console.log('🗺️ Getting user location...');
+          logger.debug('🗺️ Getting user location...');
           getUserLocation();
         } else {
-          console.log('🗺️ No location permission, using default region');
+          logger.debug('🗺️ No location permission, using default region');
         }
         fetchHives();
       };
@@ -149,14 +150,14 @@ export const useMapScreen = () => {
 
   useEffect(() => {
     if (mapReady && userLocation) {
-      console.log('🗺️ Map ready and user location available, centering map');
+      logger.debug('🗺️ Map ready and user location available, centering map');
       centerMapOn(userLocation);
     }
   }, [mapReady, userLocation, centerMapOn]);
 
   useEffect(() => {
     if (permissionStatus === Location.PermissionStatus.GRANTED && !userLocation) {
-      console.log('🗺️ Permission granted, getting user location');
+      logger.debug('🗺️ Permission granted, getting user location');
       getUserLocation();
     }
   }, [permissionStatus, userLocation, getUserLocation]);

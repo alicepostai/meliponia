@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as Location from 'expo-location';
 import { useCameraPermissions } from 'expo-camera';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 export interface PermissionStatus {
   camera: boolean;
@@ -22,7 +24,7 @@ export const usePermissions = () => {
       setLocationPermission(permission);
       return permission;
     } catch (error) {
-      console.error('Error checking location permission:', error);
+      logger.error('Error checking location permission:', error);
       return null;
     }
   }, []);
@@ -33,7 +35,7 @@ export const usePermissions = () => {
       setLocationPermission(permission);
       return permission;
     } catch (error) {
-      console.error('Error requesting location permission:', error);
+      logger.error('Error requesting location permission:', error);
       return null;
     }
   }, []);
@@ -42,26 +44,22 @@ export const usePermissions = () => {
     setLoading(true);
 
     try {
-      console.log('Requesting all permissions...');
+      logger.debug('Requesting all permissions...');
 
       if (!cameraPermission?.granted) {
-        console.log('Requesting camera permission...');
+        logger.debug('Requesting camera permission...');
         await requestCameraPermission();
       }
 
       if (!locationPermission?.granted) {
-        console.log('Requesting location permission...');
+        logger.debug('Requesting location permission...');
         await requestLocationPermission();
       }
 
-      console.log('All permissions requested');
+      logger.debug('All permissions requested');
     } catch (error) {
-      console.error('Error requesting permissions:', error);
-      Alert.alert(
-        'Erro de Permissões',
-        'Não foi possível solicitar as permissões necessárias. Por favor, verifique as configurações do dispositivo.',
-        [{ text: 'OK' }],
-      );
+      logger.error('Error requesting permissions:', error);
+      AlertService.showPermissionError();
     } finally {
       setLoading(false);
     }
@@ -78,7 +76,7 @@ export const usePermissions = () => {
     try {
       await checkLocationPermission();
     } catch (error) {
-      console.error('Error checking permissions:', error);
+      logger.error('Error checking permissions:', error);
     } finally {
       setLoading(false);
     }

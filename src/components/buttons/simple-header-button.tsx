@@ -1,6 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Alert } from 'react-native';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 interface SimpleHeaderButtonProps {
   onPress: () => void;
@@ -9,8 +11,11 @@ interface SimpleHeaderButtonProps {
 
 export default function SimpleHeaderButton({ onPress, color }: SimpleHeaderButtonProps) {
   const handlePress = () => {
-    console.log('SimpleHeaderButton pressed');
-    Alert.alert('Button Test', 'Botão funcionando!', [{ text: 'OK', onPress }]);
+    logger.debug('SimpleHeaderButton pressed');
+    AlertService.showSuccess('Botão funcionando!', {
+      title: 'Button Test',
+      onAction: onPress
+    });
   };
 
   return (

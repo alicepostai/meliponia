@@ -64,7 +64,6 @@ const QRCodeItem = memo(
     const styles = useQRCodeItemStyles();
     const { colors } = useTheme();
 
-    // Gera QR code melhorado com informações extras
     const qrData = DeepLinkingUtils.generateHiveQRData(
       item.id,
       item.hiveCode || undefined,

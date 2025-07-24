@@ -109,12 +109,13 @@ export abstract class BaseService {
 
   protected async fetchRecords<T>(
     table: string,
+    selectColumns: string = '*',
     filters: Record<string, any> = {},
     orderBy?: { column: string; ascending?: boolean },
     context?: string,
   ): Promise<{ data: T[] | null; error: PostgrestError | null }> {
     return this.executeQuery(async () => {
-      let query = supabase.from(table).select('*');
+      let query = supabase.from(table).select(selectColumns);
       Object.entries(filters).forEach(([key, value]) => {
         query = query.eq(key, value);
       });
@@ -127,11 +128,12 @@ export abstract class BaseService {
 
   protected async fetchSingleRecord<T>(
     table: string,
+    selectColumns: string = '*',
     condition: Record<string, any>,
     context?: string,
   ): Promise<{ data: T | null; error: PostgrestError | null }> {
     return this.executeQuery(async () => {
-      let query = supabase.from(table).select('*');
+      let query = supabase.from(table).select(selectColumns);
       Object.entries(condition).forEach(([key, value]) => {
         query = query.eq(key, value);
       });

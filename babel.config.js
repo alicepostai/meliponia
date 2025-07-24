@@ -10,9 +10,7 @@ module.exports = function (api) {
           extensions: ['.ios.js', '.android.js', '.js', '.ts', '.tsx', '.json'],
           alias: {
             '@': './src',
-            '@/assets': './assets',
-            //adicionar outros aliases aqui se precisar
-            //ex: '@/assets': './assets'
+            '@/assets': './assets'
           },
         },
       ],

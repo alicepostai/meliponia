@@ -8,6 +8,7 @@ import * as Print from 'expo-print';
 import { useHiveList } from '@/hooks/UseHiveList';
 import { ProcessedHiveListItem } from '@/types/DataTypes';
 import { getBeeNameByScientificName } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
 const APP_SCHEME = 'meliponia';
 export const useQRCodesScreen = () => {
   const params = useLocalSearchParams<{
@@ -36,7 +37,7 @@ export const useQRCodesScreen = () => {
       const uri = await viewShot.capture?.();
       return uri || null;
     } catch (e) {
-      console.error('Erro ao capturar QR Code:', e);
+      logger.error('Erro ao capturar QR Code:', e);
       return null;
     }
   }, []);
@@ -92,17 +93,17 @@ export const useQRCodesScreen = () => {
     [isProcessing, captureQrCodeAsBase64],
   );
   const navigateToScanner = useCallback(() => {
-    console.log('Navigating to QR scanner - useCallback triggered');
+    logger.debug('Navigating to QR scanner - useCallback triggered');
     try {
-      console.log('Attempting navigation to /hive/qr-scanner');
+      logger.debug('Attempting navigation to /hive/qr-scanner');
       router.push('/hive/qr-scanner');
-      console.log('Navigation push completed');
+      logger.debug('Navigation push completed');
     } catch (error) {
-      console.error('Navigation error:', error);
+      logger.error('Navigation error:', error);
       try {
         router.navigate('/hive/qr-scanner');
       } catch (fallbackError) {
-        console.error('Fallback navigation error:', fallbackError);
+        logger.error('Fallback navigation error:', fallbackError);
       }
     }
   }, [router]);

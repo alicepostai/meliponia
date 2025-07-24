@@ -19,6 +19,7 @@ import { DeepLinkingUtils } from '@/utils/deep-linking';
 import { useAuth } from '@/contexts/AuthContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useDeepLinking } from '@/hooks/UseDeepLinking';
+import { logger } from '@/utils/logger';
 
 const createPaperTheme = (themeColors: AppColorPalette, isDarkMode: boolean) => {
   return {
@@ -45,7 +46,6 @@ function ThemedInitialLayoutWithOnboarding() {
   const router = useRouter();
   const { session, loading } = useAuth();
 
-  // Inicializa o sistema de deep linking
   useDeepLinking();
 
   const [fontsLoaded, fontError] = useFonts({
@@ -84,7 +84,7 @@ function ThemedInitialLayoutWithOnboarding() {
     const handleInitialURL = async () => {
       const initialUrl = await Linking.getInitialURL();
       if (initialUrl) {
-        console.log('URL inicial encontrada:', initialUrl);
+        logger.debug('URL inicial encontrada:', initialUrl);
         handleUrl(initialUrl);
       }
     };
@@ -112,7 +112,7 @@ function ThemedInitialLayoutWithOnboarding() {
   useEffect(() => {
     const canHideSplash = fontsLoaded || fontError;
     if (canHideSplash) {
-      SplashScreen.hideAsync().catch(e => console.error('HIDING SPLASH ERROR:', e));
+      SplashScreen.hideAsync().catch(e => logger.error('HIDING SPLASH ERROR:', e));
     }
   }, [fontsLoaded, fontError]);
 
@@ -126,7 +126,7 @@ function ThemedInitialLayoutWithOnboarding() {
   }
 
   if (fontError) {
-    console.error('FONT ERROR:', fontError);
+    logger.error('FONT ERROR:', fontError);
     return <FontErrorDisplay error={fontError} />;
   }
 

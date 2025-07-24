@@ -16,6 +16,8 @@ import { HiveDivisionFormValues } from '@/types/DataTypes';
 import NetInfo from '@react-native-community/netinfo';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { serviceRegistry } from './ServiceRegistry';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 
 const handleOffline = async (type: OfflineAction['type'], payload: any, forceOnline: boolean) => {
   const netState = await NetInfo.fetch();
@@ -65,7 +67,7 @@ export const actionService = {
       if (error) throw error;
       return { data: data || [], error: null };
     } catch (error) {
-      const { error: handledError } = handleActionError(error, 'Buscar Histórico de Ações');
+      const { error: handledError } = handleActionError(error, 'ActionService.fetchActionHistory: Failed to fetch action history');
       return { data: null, error: handledError };
     }
   },
@@ -91,7 +93,7 @@ export const actionService = {
       });
       return { data: combined, error: null };
     } catch (error) {
-      const { error: handledError } = handleActionError(error, 'Buscar Timeline da Colmeia');
+      const { error: handledError } = handleActionError(error, 'ActionService.fetchHiveTimeline: Failed to fetch hive timeline');
       return { data: [], error: handledError };
     }
   },
@@ -125,7 +127,7 @@ export const actionService = {
       });
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Alimentação');
+      return handleActionError(error, 'ActionService.createFeedingAction: Failed to register feeding');
     }
   },
   createHarvestAction: async (
@@ -165,7 +167,7 @@ export const actionService = {
       });
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Colheita');
+      return handleActionError(error, 'ActionService.createHarvestAction: Failed to register harvest');
     }
   },
   createInspectionAction: async (
@@ -205,7 +207,7 @@ export const actionService = {
       });
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Revisão');
+      return handleActionError(error, 'ActionService.createInspectionAction: Failed to register inspection');
     }
   },
   createMaintenanceAction: async (
@@ -238,7 +240,7 @@ export const actionService = {
       });
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Manejo');
+      return handleActionError(error, 'ActionService.createMaintenanceAction: Failed to register maintenance');
     }
   },
   createTransferAction: async (
@@ -270,7 +272,7 @@ export const actionService = {
       });
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Transferência');
+      return handleActionError(error, 'ActionService.createTransferAction: Failed to register transfer');
     }
   },
   createOutgoingTransaction: async (
@@ -308,16 +310,18 @@ export const actionService = {
       await supabase.from('hive').update({ status: hiveStatus }).eq('id', hiveId);
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Registrar Saída de Colmeia');
+      return handleActionError(error, 'ActionService.createOutgoingTransaction: Failed to register outgoing transaction');
     }
   },
   deleteHiveAction: async (actionId: string): Promise<{ success: boolean }> => {
     const netState = await NetInfo.fetch();
     if (!netState.isConnected || !netState.isInternetReachable) {
       await serviceRegistry.getOfflineSyncService().queueAction('deleteHiveAction', { actionId });
-      Alert.alert(
-        'Modo Offline',
+      AlertService.showError(
         'Você está sem conexão. A exclusão foi salva e será processada assim que a internet voltar.',
+        {
+          title: 'Modo Offline'
+        }
       );
       return { success: true };
     }
@@ -338,7 +342,7 @@ export const actionService = {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      return handleActionError(error, 'Excluir Registro');
+      return handleActionError(error, 'ActionService.deleteHiveAction: Failed to delete action record');
     }
   },
   createHiveFromDivision: async (
@@ -386,7 +390,7 @@ export const actionService = {
         insertGenericAction({
           user_id: user.id,
           hive_id: newHive.id,
-          action_type: 'Divisão de Enxame',
+          action_type: 'Divisão de Colmeia',
           action_date: actionDate.toISOString(),
           observation: divisionObservation,
           action_id: null,
@@ -403,10 +407,10 @@ export const actionService = {
         ),
       ]);
       if (!forceOnline)
-        Alert.alert('Tudo Certo!', `Nova colmeia #${newHive.hive_code} criada por divisão!`);
+        AlertService.showSuccess(`Nova colmeia #${newHive.hive_code} criada por divisão!`);
       return { success: true, newHiveId: newHive.id };
     } catch (error) {
-      const { success } = handleActionError(error, 'Registrar Divisão');
+      const { success } = handleActionError(error, 'ActionService.createHiveFromDivision: Failed to register division');
       return { success, newHiveId: null };
     }
   },
@@ -418,11 +422,13 @@ export const actionService = {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'hive_action', filter: `hive_id=eq.${hiveId}` },
         payload => {
-          console.log(`Real-time: Mudança em 'hive_action' para a colmeia ${hiveId}.`, payload);
           callback(payload);
         },
       )
-      .subscribe(status => console.log(`Canal '${channelName}' status: ${status}`));
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED')
+          logger.info(`ActionService.subscribeToActionChanges: Successfully subscribed to action changes for hive ${hiveId}`);
+      });
   },
   subscribeToTransactionChanges: (
     hiveId: string,
@@ -435,13 +441,12 @@ export const actionService = {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'hive_transaction', filter: `hive_id=eq.${hiveId}` },
         payload => {
-          console.log(
-            `Real-time: Mudança em 'hive_transaction' para a colmeia ${hiveId}.`,
-            payload,
-          );
           callback(payload);
         },
       )
-      .subscribe(status => console.log(`Canal '${channelName}' status: ${status}`));
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED')
+          logger.info(`ActionService.subscribeToTransactionChanges: Successfully subscribed to transaction changes for hive ${hiveId}`);
+      });
   },
 };

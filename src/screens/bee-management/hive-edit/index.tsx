@@ -58,7 +58,7 @@ const HiveEditScreen = memo(() => {
   if (loading) {
     return (
       <ScreenWrapper scrollable>
-        <Stack.Screen options={{ title: 'Editar Enxame' }} />
+        <Stack.Screen options={{ title: 'Editar Colmeia' }} />
       </ScreenWrapper>
     );
   }
@@ -66,7 +66,7 @@ const HiveEditScreen = memo(() => {
   if (error || !initialValues) {
     return (
       <ScreenWrapper scrollable>
-        <Stack.Screen options={{ title: 'Editar Enxame' }} />
+        <Stack.Screen options={{ title: 'Editar Colmeia' }} />
       </ScreenWrapper>
     );
   }
@@ -74,7 +74,7 @@ const HiveEditScreen = memo(() => {
   return (
     <>
       <ScreenWrapper scrollable>
-        <Stack.Screen options={{ title: 'Editar Enxame' }} />
+        <Stack.Screen options={{ title: 'Editar Colmeia' }} />
         <Formik<HiveEditFormValues>
           innerRef={formikRef}
           initialValues={initialValues!}
@@ -94,7 +94,7 @@ const HiveEditScreen = memo(() => {
           }) => (
             <View style={styles.formContainer}>
               <View style={styles.formSection}>
-                <Text style={styles.sectionTitle}>Dados do Enxame</Text>
+                <Text style={styles.sectionTitle}>Dados da Colmeia</Text>
                 <View style={styles.fieldsGroupContainer}>
                   <View style={styles.fieldWrapper}>
                     <ImageComboBox
@@ -215,7 +215,7 @@ const HiveEditScreen = memo(() => {
                       isGettingLocation={isGettingLocation}
                       onGetCurrentLocation={getCurrentLocation}
                       onOpenLocationPicker={openLocationPicker}
-                      label="Localização do Enxame"
+                      label="Localização da Colmeia"
                     />
                   </View>
                 </View>
@@ -242,7 +242,7 @@ const HiveEditScreen = memo(() => {
               </View>
 
               <MainButton
-                title="Atualizar Enxame"
+                title="Atualizar Colmeia"
                 onPress={() => handleSubmit()}
                 loading={isSubmitting || formikSubmitting}
                 disabled={isSubmitting || formikSubmitting}

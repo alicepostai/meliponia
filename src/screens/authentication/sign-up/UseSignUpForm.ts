@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FormikHelpers } from 'formik';
 import { authService } from '@/services/AuthService';
+import { logger } from '@/utils/logger';
 export interface SignupFormValues {
   email: string;
   password: string;
@@ -21,14 +22,14 @@ export const useSignupForm = () => {
 
       try {
         const { email, password } = values;
-        console.log('UseSignUpForm: Iniciando cadastro para email:', email);
+        logger.info('UseSignUpForm: Iniciando cadastro para email:', email);
 
         const { data, error } = await authService.signUp({ email, password });
 
         setIsSubmitting(false);
         formikActions.setSubmitting(false);
 
-        console.log('UseSignUpForm: Resultado do cadastro:', {
+        logger.info('UseSignUpForm: Resultado do cadastro:', {
           hasData: !!data,
           hasUser: !!data?.user,
           hasSession: !!data?.session,
@@ -37,7 +38,7 @@ export const useSignupForm = () => {
         });
 
         if (error) {
-          console.log('UseSignUpForm: Erro detectado no cadastro:', error.message);
+          logger.warn('UseSignUpForm: Erro detectado no cadastro:', error.message);
 
           if (
             error.message.toLowerCase().includes('user already registered') ||
@@ -47,7 +48,7 @@ export const useSignupForm = () => {
             error.message.toLowerCase().includes('email rate limit exceeded') ||
             error.message.toLowerCase().includes('signup disabled')
           ) {
-            console.log('UseSignUpForm: Detectado erro de usuário já existente');
+            logger.warn('UseSignUpForm: Detectado erro de usuário já existente');
             Alert.alert(
               'E-mail já cadastrado',
               'Este e-mail já possui uma conta. Tente fazer login ou use outro e-mail.',
@@ -75,7 +76,7 @@ export const useSignupForm = () => {
       } catch (error) {
         setIsSubmitting(false);
         formikActions.setSubmitting(false);
-        console.error('Erro inesperado no cadastro:', error);
+        logger.error('Erro inesperado no cadastro:', error);
       }
     },
     [router],

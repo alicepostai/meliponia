@@ -17,7 +17,7 @@ import { ProcessedHiveListItem } from '@/types/DataTypes';
 const hiveSortOptions: SortOptionItem<SortOption>[] = [
   { label: 'Data de Criação', value: 'creationDate' },
   { label: 'Nome da Espécie', value: 'speciesName' },
-  { label: 'Código do Enxame', value: 'hiveCode' },
+  { label: 'Código da Colmeia', value: 'hiveCode' },
 ];
 const HiveListContent = memo(
   ({
@@ -117,7 +117,7 @@ const HiveListScreen = memo(() => {
       id: '4',
       title: 'Adicionar Nova Colmeia',
       description:
-        'No canto inferior direito há um botão (+) onde você pode registrar uma nova colmeia ou fazer divisão de enxames.',
+        'No canto inferior direito há um botão (+) onde você pode registrar uma nova colmeia ou fazer divisão de colmeias.',
       position: 'top' as const,
     },
   ];

@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { onboardingService } from '@/services/OnboardingService';
 import { fonts } from '@/theme/fonts';
+import { logger } from '@/utils/logger';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -45,7 +46,7 @@ const onboardingSlides: OnboardingSlide[] = [
     id: '4',
     title: 'Use QR Codes',
     description:
-      'Gere QR codes únicos para suas colmeias e transfira dados facilmente. Perfeito para compartilhar informações com outros apicultores.',
+      'Gere QR codes únicos para suas colmeias e transfira dados facilmente. Perfeito para compartilhar informações com outros meliponicultores.',
     icon: 'qrcode',
     backgroundColor: '#E17055',
   },
@@ -53,7 +54,7 @@ const onboardingSlides: OnboardingSlide[] = [
     id: '5',
     title: 'Visualize no Mapa',
     description:
-      'Veja todas suas colmeias em um mapa interativo. Encontre rapidamente a localização de cada uma e organize seu apiário.',
+      'Veja todas suas colmeias em um mapa interativo. Encontre rapidamente a localização de cada uma e organize seu meliponário.',
     icon: 'map-marker-multiple',
     backgroundColor: '#0984E3',
   },
@@ -85,7 +86,7 @@ export default function OnboardingScreen() {
       await onboardingService.resetTutorial();
       router.replace('/(app)/(tabs)');
     } catch (error) {
-      console.error('Erro ao finalizar onboarding:', error);
+      logger.error('Erro ao finalizar onboarding:', error);
       router.replace('/(app)/(tabs)');
     }
   };

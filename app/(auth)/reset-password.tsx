@@ -15,6 +15,8 @@ import { CommonValidations } from '@/utils/validations';
 import { useTheme } from '@/contexts/ThemeContext';
 import { StyleSheet } from 'react-native';
 import { metrics } from '@/theme/metrics';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 const ResetPasswordSchema = Yup.object().shape({
   password: CommonValidations.password(),
@@ -47,7 +49,7 @@ export default function ResetPasswordScreen() {
       setIsLoading(true);
 
       if (error) {
-        console.log('Erro recebido na URL:', error);
+        logger.debug('Erro recebido na URL:', error);
 
         switch (error) {
           case 'token_expired':
@@ -79,7 +81,7 @@ export default function ResetPasswordScreen() {
       }
 
       if (token_verified === 'true') {
-        console.log('Token verificado com sucesso');
+        logger.debug('Token verificado com sucesso');
         setIsValidSession(true);
         setIsLoading(false);
         return;
@@ -92,17 +94,17 @@ export default function ResetPasswordScreen() {
         } = await supabase.auth.getSession();
 
         if (sessionError) {
-          console.error('Erro ao verificar sessão:', sessionError);
+          logger.error('Erro ao verificar sessão:', sessionError);
           setIsValidSession(false);
         } else if (currentSession) {
-          console.log('Sessão ativa encontrada');
+          logger.debug('Sessão ativa encontrada');
           setIsValidSession(true);
         } else {
-          console.log('Nenhuma sessão ativa encontrada');
+          logger.debug('Nenhuma sessão ativa encontrada');
           setIsValidSession(false);
         }
       } catch (error) {
-        console.error('Erro ao verificar sessão:', error);
+        logger.error('Erro ao verificar sessão:', error);
         setIsValidSession(false);
       }
 
@@ -114,7 +116,7 @@ export default function ResetPasswordScreen() {
 
   const handleResetPassword = async (values: ResetFormValues) => {
     if (!isValidSession) {
-      Alert.alert('Erro', 'Sessão inválida. Solicite um novo link de recuperação.');
+      AlertService.showAuthError();
       return;
     }
 
@@ -130,8 +132,8 @@ export default function ResetPasswordScreen() {
         }, 3000);
       }
     } catch (error) {
-      console.error('Erro ao alterar senha:', error);
-      Alert.alert('Erro', 'Não foi possível alterar a senha. Tente novamente.', [{ text: 'OK' }]);
+      logger.error('Erro ao alterar senha:', error);
+      AlertService.showError('Não foi possível alterar a senha. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }

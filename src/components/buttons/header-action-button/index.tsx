@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useTheme } from '@/contexts/ThemeContext';
 import { metrics } from '@/theme/metrics';
 import { useHeaderActionButtonStyles } from './styles';
+import { logger } from '@/utils/logger';
 interface HeaderActionButtonProps {
   iconName: string;
   accessibilityLabel: string;
@@ -30,11 +31,11 @@ const HeaderActionButton = memo(
       : iconColor || themeColors.headerText;
 
     const handlePress = () => {
-      console.log(`HeaderActionButton pressed: ${accessibilityLabel}`);
+      logger.debug(`HeaderActionButton pressed: ${accessibilityLabel}`);
       if (onPress) {
         onPress();
       } else {
-        console.warn('HeaderActionButton: onPress function is undefined');
+        logger.warn('HeaderActionButton: onPress function is undefined');
       }
     };
 

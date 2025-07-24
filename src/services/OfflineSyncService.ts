@@ -5,6 +5,8 @@ import { syncOfflineUploads } from './StorageService';
 import { EventEmitter } from 'events';
 import { OfflineAction } from './types';
 import { serviceRegistry } from './ServiceRegistry';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 
 const OFFLINE_QUEUE_KEY = 'offline_action_queue';
 let isSyncing = false;
@@ -15,7 +17,7 @@ const getQueue = async (): Promise<OfflineAction[]> => {
     const queueJson = await AsyncStorage.getItem(OFFLINE_QUEUE_KEY);
     return queueJson ? JSON.parse(queueJson) : [];
   } catch (error) {
-    console.error('OfflineSyncService: Erro ao obter fila offline.', error);
+    logger.error('OfflineSyncService: Erro ao obter fila offline.', error);
     return [];
   }
 };
@@ -23,22 +25,22 @@ const saveQueue = async (queue: OfflineAction[]): Promise<void> => {
   try {
     await AsyncStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
   } catch (error) {
-    console.error('OfflineSyncService: Erro ao salvar fila offline.', error);
+    logger.error('OfflineSyncService: Erro ao salvar fila offline.', error);
   }
 };
 const executeAction = async (action: OfflineAction): Promise<boolean> => {
-  console.log(`OfflineSyncService: Executando ação offline: ${action.type}`);
+  logger.info(`OfflineSyncService: Executando ação offline: ${action.type}`);
   try {
     const result = await serviceRegistry.executeOfflineAction(action);
     return !!(result.success !== false && (result.data || result.success));
   } catch (error) {
-    console.error(`OfflineSyncService: Erro ao executar ação ${action.type}:`, error);
+    logger.error(`OfflineSyncService: Erro ao executar ação ${action.type}:`, error);
     return false;
   }
 };
 export const offlineSyncService = {
   queueAction: async (type: OfflineAction['type'], payload: any): Promise<OfflineAction> => {
-    console.log(`OfflineSyncService: Enfileirando ação: ${type}`);
+    logger.info(`OfflineSyncService: Enfileirando ação: ${type}`);
     const queue = await getQueue();
     const newAction: OfflineAction = {
       id: `offline_${Date.now()}_${Math.random()}`,
@@ -48,9 +50,11 @@ export const offlineSyncService = {
     };
     queue.push(newAction);
     await saveQueue(queue);
-    Alert.alert(
-      'Modo Offline',
+    AlertService.showError(
       'Você está sem conexão. Sua ação foi salva e será enviada assim que a internet voltar.',
+      {
+        title: 'Modo Offline'
+      }
     );
     return newAction;
   },
@@ -66,9 +70,11 @@ export const offlineSyncService = {
       ]);
       return;
     }
-    console.log(`OfflineSyncService: Iniciando sincronização de ${queue.length} ações.`);
+    logger.info(`OfflineSyncService: Iniciando sincronização de ${queue.length} ações.`);
     isSyncing = true;
-    Alert.alert('Sincronizando...', `Enviando ${queue.length} ações pendentes.`);
+    AlertService.showSuccess(`Enviando ${queue.length} ações pendentes.`, {
+      title: 'Sincronizando...'
+    });
     const remainingActions: OfflineAction[] = [];
     for (const action of queue) {
       const success = await executeAction(action);
@@ -83,11 +89,13 @@ export const offlineSyncService = {
     ]);
     isSyncing = false;
     if (remainingActions.length === 0) {
-      console.log('OfflineSyncService: Fila sincronizada com sucesso!');
-      Alert.alert('Sincronização Concluída', 'Todas as suas ações pendentes foram salvas.');
+      logger.info('OfflineSyncService: Fila sincronizada com sucesso!');
+      AlertService.showSuccess('Todas as suas ações pendentes foram salvas.', {
+        title: 'Sincronização Concluída'
+      });
       syncEmitter.emit('syncComplete');
     } else {
-      console.warn(`OfflineSyncService: ${remainingActions.length} ações falharam.`);
+      logger.warn(`OfflineSyncService: ${remainingActions.length} ações falharam.`);
       Alert.alert(
         'Sincronização Parcial',
         `${remainingActions.length} ações não puderam ser enviadas.`,
@@ -96,10 +104,10 @@ export const offlineSyncService = {
   },
   initialize: (): void => {
     if (netInfoUnsubscribe) {
-      console.log('OfflineSyncService: Já inicializado.');
+      logger.debug('OfflineSyncService: Já inicializado.');
       return;
     }
-    console.log('OfflineSyncService: Inicializando listener de conexão.');
+    logger.info('OfflineSyncService: Inicializando listener de conexão.');
     offlineSyncService.syncQueue();
     netInfoUnsubscribe = NetInfo.addEventListener(state => {
       if (state.isConnected && state.isInternetReachable) {
@@ -109,7 +117,7 @@ export const offlineSyncService = {
   },
   unsubscribe: (): void => {
     if (netInfoUnsubscribe) {
-      console.log('OfflineSyncService: Removendo listener de conexão.');
+      logger.info('OfflineSyncService: Removendo listener de conexão.');
       netInfoUnsubscribe();
       netInfoUnsubscribe = null;
     }
@@ -132,7 +140,7 @@ export const offlineSyncService = {
       const uploadsCount = imageUploads ? JSON.parse(imageUploads).length : 0;
       return actionsCount + profileCount + uploadsCount;
     } catch (error) {
-      console.error('OfflineSyncService: Erro ao contar itens offline:', error);
+      logger.error('OfflineSyncService: Erro ao contar itens offline:', error);
       return 0;
     }
   },

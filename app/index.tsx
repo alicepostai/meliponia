@@ -9,17 +9,7 @@ export default function Index() {
   const { onboardingStatus, isLoading: onboardingLoading } = useOnboarding();
   const { colors } = useTheme();
 
-  console.log('Index - Estado atual:', {
-    user: !!user,
-    userEmail: user?.email,
-    authLoading,
-    onboardingLoading,
-    hasSeenOnboarding: onboardingStatus.hasSeenOnboarding,
-    hasSeenTutorial: onboardingStatus.hasSeenTutorial,
-  });
-
   if (authLoading || onboardingLoading) {
-    console.log('Index - Mostrando loading...');
     return (
       <View
         style={{
@@ -35,15 +25,12 @@ export default function Index() {
   }
 
   if (!user) {
-    console.log('Index - Redirecionando para login (usuário não logado)');
     return <Redirect href="/(auth)/login" />;
   }
 
   if (!onboardingStatus.hasSeenOnboarding && !onboardingStatus.hasSeenTutorial) {
-    console.log('Index - Redirecionando para onboarding (usuário novo)');
     return <Redirect href="/(onboarding)" />;
   }
 
-  console.log('Index - Redirecionando para app principal (usuário logado e já viu onboarding)');
   return <Redirect href="/(app)/(tabs)" />;
 }

@@ -93,9 +93,15 @@ export const CommonValidations = {
     Yup.date().max(getEndOfToday(), 'Data não pode ser futura').required('Data é obrigatória'),
   dateOptional: () => Yup.date().max(getEndOfToday(), 'Data não pode ser futura').nullable(),
   text: (maxLength = 500) =>
-    Yup.string().max(maxLength, `Texto deve ter no máximo ${maxLength} caracteres`).nullable(),
+    Yup.string()
+      .trim()
+      .transform(value => value?.replace(/\s+/g, ' '))
+      .max(maxLength, `Texto deve ter no máximo ${maxLength} caracteres`)
+      .nullable(),
   textRequired: (maxLength = 500) =>
     Yup.string()
+      .trim()
+      .transform(value => value?.replace(/\s+/g, ' '))
       .max(maxLength, `Texto deve ter no máximo ${maxLength} caracteres`)
       .required('Campo obrigatório'),
   conditionalCurrency: (condition: string, conditionValue: any) =>

@@ -20,12 +20,12 @@ export const useHiveListScreen = () => {
   const fabOptions = useMemo(
     () => [
       {
-        label: 'Divisão de Enxame',
+        label: 'Divisão de Colmeia',
         icon: 'call-split',
         onPress: navigateToHiveDivision,
       },
       {
-        label: 'Criar Enxame',
+        label: 'Criar Colmeia',
         icon: 'beehive-outline',
         onPress: navigateToHiveRegistration,
       },

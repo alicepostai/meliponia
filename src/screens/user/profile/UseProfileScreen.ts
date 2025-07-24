@@ -12,6 +12,7 @@ import {
 } from '@/services/StorageService';
 import { DbProfile } from '@/types/supabase';
 import { AlertService } from '@/services/AlertService';
+import { logger } from '@/utils/logger';
 export const useProfileScreen = () => {
   const { user, logout } = useAuth();
   const { navigateToChangePassword } = useCommonNavigation();
@@ -65,7 +66,7 @@ export const useProfileScreen = () => {
             daysActive: Math.max(0, daysActive),
           });
         } catch (error) {
-          console.error('Erro ao buscar estatísticas:', error);
+          logger.error('Erro ao buscar estatísticas:', error);
         }
       }
     };
@@ -112,7 +113,7 @@ export const useProfileScreen = () => {
           );
         }
       } catch (error) {
-        console.error('Erro no upload de avatar:', error);
+        logger.error('Erro no upload de avatar:', error);
         Alert.alert('Erro Inesperado', 'Ocorreu um erro ao processar sua imagem. Tente novamente.');
       } finally {
         clearSelectedImage();
@@ -270,7 +271,7 @@ export const useProfileScreen = () => {
           daysActive: Math.max(0, daysActive),
         });
       } catch (error) {
-        console.error('Erro ao atualizar estatísticas:', error);
+        logger.error('Erro ao atualizar estatísticas:', error);
       }
     }
   }, [user?.id, user?.created_at]);

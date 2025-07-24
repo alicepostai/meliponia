@@ -23,7 +23,7 @@ const HiveOutgoingScreen = memo(() => {
   const formikRef = useRef<FormikProps<HiveOutgoingFormValues>>(null);
   return (
     <ScreenWrapper scrollable>
-      <Stack.Screen options={{ title: 'Registrar Saída de Enxame' }} />
+      <Stack.Screen options={{ title: 'Registrar Saída de Colmeia' }} />
       <Formik<HiveOutgoingFormValues>
         innerRef={formikRef}
         initialValues={{

@@ -7,6 +7,7 @@ import { HiveDetails, HiveTimelineItem } from '@/types/DataTypes';
 import { processHiveDetails, processTimelineData } from '@/utils/data-processors';
 import { useAuth } from '@/contexts/AuthContext';
 import { Alert } from 'react-native';
+import { logger } from '@/utils/logger';
 export const useHiveDetails = (hiveId: string | undefined) => {
   const { user } = useAuth();
   const [hive, setHive] = useState<HiveDetails | null>(null);
@@ -35,7 +36,7 @@ export const useHiveDetails = (hiveId: string | undefined) => {
         setHive(processHiveDetails(hiveResult.data));
         setTimeline(await processTimelineData(timelineResult.data));
       } catch (e: any) {
-        console.error('useHiveDetails -> fetchData: Exceção geral', e);
+        logger.error('useHiveDetails -> fetchData: Exceção geral', e);
         setError(e.message || 'Ocorreu um erro inesperado.');
         setHive(null);
         setTimeline([]);
@@ -60,7 +61,7 @@ export const useHiveDetails = (hiveId: string | undefined) => {
   useEffect(() => {
     if (!hiveId || !user?.id) return;
     const handleDbChange = (sourceTable: string) => {
-      console.log(`useHiveDetails -> Realtime: Mudança detectada na tabela ${sourceTable}`);
+      logger.debug(`useHiveDetails -> Realtime: Mudança detectada na tabela ${sourceTable}`);
       fetchData(false);
     };
     const newHiveChannel = hiveService.subscribeToHiveChanges(user.id, () =>
@@ -76,7 +77,7 @@ export const useHiveDetails = (hiveId: string | undefined) => {
       Boolean,
     ) as RealtimeChannel[];
     return () => {
-      console.log('useHiveDetails -> Limpando subscrições...');
+      logger.debug('useHiveDetails -> Limpando subscrições...');
       channelsRef.current.forEach(channel => hiveService.unsubscribeChannel(channel));
       channelsRef.current = [];
     };

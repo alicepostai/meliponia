@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useTheme } from '@/contexts/ThemeContext';
 import { fonts, fontSizes } from '@/theme/fonts';
 import { metrics } from '@/theme/metrics';
+import { logger } from '@/utils/logger';
 
 interface UnifiedLocationSelectorProps {
   latitude: number | null;
@@ -27,7 +28,7 @@ const UnifiedLocationSelector = memo<UnifiedLocationSelectorProps>(
   }) => {
     const { colors } = useTheme();
 
-    console.log('UnifiedLocationSelector render - latitude:', latitude, 'longitude:', longitude);
+    logger.debug('UnifiedLocationSelector render - latitude:', latitude, 'longitude:', longitude);
 
     const styles = useMemo(
       () =>

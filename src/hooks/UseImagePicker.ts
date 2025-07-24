@@ -8,6 +8,8 @@ import {
   ImageLibraryOptions,
   Asset,
 } from 'react-native-image-picker';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 export interface UseImagePickerResult {
   selectedImage: Asset | null;
   pickImageFromGallery: () => void;
@@ -44,30 +46,32 @@ export const useImagePicker = (
         return true;
       }
       setPermissionError('Permissão de câmera negada.');
-      Alert.alert('Permissão Negada', 'Você precisa conceder permissão à câmera para tirar fotos.');
+      AlertService.showError('Você precisa conceder permissão à câmera para tirar fotos.', {
+        title: 'Permissão Negada'
+      });
       return false;
     } catch (err) {
-      console.warn('Error requesting camera permission:', err);
+      logger.warn('Error requesting camera permission:', err);
       setPermissionError('Erro ao solicitar permissão da câmera.');
-      Alert.alert('Erro', 'Ocorreu um erro ao solicitar permissão da câmera.');
+      AlertService.showError('Ocorreu um erro ao solicitar permissão da câmera.');
       return false;
     }
   }, []);
   const handleResponse = useCallback((response: ImagePickerResponse) => {
     if (response.didCancel) {
-      console.log('User cancelled image picker');
+      logger.debug('User cancelled image picker');
       return;
     }
     if (response.errorCode) {
-      console.error('ImagePicker Error: ', response.errorCode, response.errorMessage);
-      Alert.alert('Erro', response.errorMessage || 'Não foi possível selecionar a imagem.');
+      logger.error('ImagePicker Error: ', response.errorCode, response.errorMessage);
+      AlertService.showError(response.errorMessage || 'Não foi possível selecionar a imagem.');
       setSelectedImage(null);
       return;
     }
     if (response.assets && response.assets.length > 0) {
       setSelectedImage(response.assets[0]);
     } else {
-      console.warn('ImagePicker response missing assets.');
+      logger.warn('ImagePicker response missing assets.');
       setSelectedImage(null);
     }
   }, []);

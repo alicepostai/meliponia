@@ -10,6 +10,7 @@ import {
   HIVE_IMAGES_BUCKET_NAME,
 } from '@/services/StorageService';
 import { getBeeImageUrlById } from '@/utils/helpers';
+import { logger } from '@/utils/logger';
 type HiveActionScreenPath =
   | 'actions/feeding'
   | 'actions/harvest'
@@ -58,7 +59,7 @@ export const useHiveScreen = () => {
               'Sua alteração foi salva e será enviada quando você estiver online.',
             );
           } else {
-            console.error('Erro ao atualizar hive no banco:', updateResult.error);
+            logger.error('Erro ao atualizar hive no banco:', updateResult.error);
             Alert.alert(
               'Erro no Banco',
               updateResult.error?.message || 'Falha ao salvar URL da imagem no banco de dados.',
@@ -70,7 +71,7 @@ export const useHiveScreen = () => {
             'Sua imagem foi salva e será enviada quando você estiver online.',
           );
         } else {
-          console.error('Erro no upload da imagem:', uploadResult.error);
+          logger.error('Erro no upload da imagem:', uploadResult.error);
 
           const errorMessage = uploadResult.error?.message || 'Não foi possível enviar a imagem.';
           let alertTitle = 'Erro de Upload';
@@ -102,7 +103,7 @@ export const useHiveScreen = () => {
           Alert.alert(alertTitle, alertMessage);
         }
       } catch (error) {
-        console.error('Erro inesperado no upload:', error);
+        logger.error('Erro inesperado no upload:', error);
         Alert.alert(
           'Erro Inesperado',
           'Ocorreu um erro inesperado ao processar a imagem. Tente novamente.',
@@ -116,11 +117,11 @@ export const useHiveScreen = () => {
     uploadAndRefresh();
   }, [selectedImage, hiveId, clearSelectedImage, refreshData]);
   const openHeaderMenu = useCallback(() => {
-    console.log('openHeaderMenu called - setting isHeaderMenuVisible to true');
+    logger.debug('openHeaderMenu called - setting isHeaderMenuVisible to true');
     setIsHeaderMenuVisible(true);
   }, []);
   const closeHeaderMenu = useCallback(() => {
-    console.log('closeHeaderMenu called - setting isHeaderMenuVisible to false');
+    logger.debug('closeHeaderMenu called - setting isHeaderMenuVisible to false');
     setIsHeaderMenuVisible(false);
   }, []);
   const navigateToEdit = useCallback(() => {

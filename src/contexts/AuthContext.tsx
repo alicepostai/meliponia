@@ -9,6 +9,7 @@ import React, {
 } from 'react';
 import { authService } from '@/services/AuthService';
 import { User, Session } from '@/types/supabase';
+import { logger } from '@/utils/logger';
 export interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -34,7 +35,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         const { data, error } = await authService.getCurrentSession();
         if (error) throw error;
 
-        console.log('AuthContext - Sessão inicial carregada:', {
+        logger.debug('AuthContext - Sessão inicial carregada:', {
           hasSession: !!data?.session,
           hasUser: !!data?.session?.user,
         });
@@ -42,7 +43,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         setSession(data?.session ?? null);
         setUser(data?.session?.user ?? null);
       } catch (err) {
-        console.error('Auth Context: Erro ao buscar sessão inicial:', err);
+        logger.error('Auth Context: Erro ao buscar sessão inicial:', err);
       } finally {
         setLoading(false);
       }
@@ -52,7 +53,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (typeof window !== 'undefined') {
       const authListener = authService.onAuthStateChange((event, currentSession) => {
-        console.log('AuthContext - Mudança de estado de auth:', {
+        logger.debug('AuthContext - Mudança de estado de auth:', {
           event,
           hasSession: !!currentSession,
           hasUser: !!currentSession?.user,

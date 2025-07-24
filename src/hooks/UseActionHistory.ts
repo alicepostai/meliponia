@@ -10,7 +10,7 @@ export type ActionTypeFilter =
   | 'Colheita'
   | 'Manejo'
   | 'Transferência de Caixa'
-  | 'Divisão de Enxame'
+  | 'Divisão de Colmeia'
   | 'Divisão Origem';
 export type ActionSortOption = 'date' | 'actionType' | 'speciesName';
 export type ActionSortDirection = 'asc' | 'desc';

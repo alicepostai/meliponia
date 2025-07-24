@@ -3,6 +3,7 @@ import { TextInput as RNTextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import { FormikHelpers } from 'formik';
 import { authService } from '@/services/AuthService';
+import { logger } from '@/utils/logger';
 export interface LoginFormValues {
   email: string;
   password: string;
@@ -29,7 +30,7 @@ export const useLoginForm = () => {
         );
       }
     } catch (error) {
-      console.error('Erro ao reenviar confirmação:', error);
+      logger.error('Erro ao reenviar confirmação:', error);
     }
   }, []);
 
@@ -63,16 +64,16 @@ export const useLoginForm = () => {
         }
 
         if (data?.session) {
-          console.log(
+          logger.info(
             'Login bem-sucedido, session disponível - navegação será gerenciada pelo index.tsx',
           );
         } else {
-          console.log('Login processado mas sem sessão retornada');
+          logger.info('Login processado mas sem sessão retornada');
         }
       } catch (error) {
         setIsSubmitting(false);
         formikActions.setSubmitting(false);
-        console.error('Erro inesperado no login:', error);
+        logger.error('Erro inesperado no login:', error);
       }
     },
     [handleResendConfirmation],

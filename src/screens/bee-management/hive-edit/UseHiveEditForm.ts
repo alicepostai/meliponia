@@ -6,6 +6,7 @@ import * as Location from 'expo-location';
 import { hiveService, UpdateHiveData } from '@/services/HiveService';
 import { beeSpeciesList, brazilianStates, boxTypes, hiveOrigins } from '@/constants';
 import { BeeSpecies, State, BoxType, HiveOrigin } from '@/types/ConstantsTypes';
+import { logger } from '@/utils/logger';
 export interface HiveEditFormValues {
   species: BeeSpecies | null;
   state: State | null;
@@ -111,20 +112,20 @@ export const useHiveEditForm = () => {
   const closeLocationPicker = useCallback(() => setIsLocationPickerVisible(false), []);
   const handleLocationSelected = useCallback(
     (location: { latitude: number; longitude: number }) => {
-      console.log('HiveEditForm: Received location from modal:', location);
+      logger.debug('HiveEditForm: Received location from modal:', location);
       const formik = formikRef.current;
       if (formik) {
         formik.setFieldValue('latitude', location.latitude);
         formik.setFieldValue('longitude', location.longitude);
         formik.setFieldTouched('latitude', true);
         formik.setFieldTouched('longitude', true);
-        console.log(
+        logger.debug(
           'HiveEditForm: Set form values - latitude:',
           location.latitude,
           'longitude:',
           location.longitude,
         );
-        console.log('HiveEditForm: Current form values after update:', formik.values);
+        logger.debug('HiveEditForm: Current form values after update:', formik.values);
       }
       closeLocationPicker();
     },

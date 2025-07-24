@@ -12,6 +12,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { useHiveScreenStyles } from './styles';
 import { useHiveScreen } from './UseHiveScreen';
 import { fonts } from '@/theme/fonts';
+import { logger } from '@/utils/logger';
 const ListHeader = memo(
   ({
     hive,
@@ -56,11 +57,17 @@ const FeedbackState = memo(
     const { colors } = useTheme();
     const message = error || 'Colmeia não encontrada.';
     return (
-      <View style={styles.centeredMessage}>
+      <View style={styles.centeredMessage} accessible={true} accessibilityRole="alert">
         <Text style={styles.errorText}>{message}</Text>
         <TouchableOpacity
           onPress={error ? () => onRetry(true) : onBack}
           style={[styles.retryButton, { backgroundColor: colors.honey }]}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={error ? 'Tentar carregar novamente' : 'Voltar para a tela anterior'}
+          accessibilityHint={
+            error ? 'Tenta carregar os dados da colmeia novamente' : 'Retorna para a tela anterior'
+          }
         >
           <Text style={[styles.retryButtonText, { color: colors.white }]}>
             {error ? 'Tentar Novamente' : 'Voltar'}
@@ -96,7 +103,13 @@ const HiveScreen = memo(() => {
   const renderContent = () => {
     if (loading && !hive) {
       return (
-        <View style={styles.centeredMessage}>
+        <View
+          style={styles.centeredMessage}
+          accessible={true}
+          accessibilityRole="progressbar"
+          accessibilityLabel="Carregando dados da colmeia"
+          accessibilityState={{ busy: true }}
+        >
           <ActivityIndicator size="large" color={colors.honey} />
           <Text style={styles.loadingText}>Carregando Colmeia...</Text>
         </View>
@@ -136,12 +149,16 @@ const HiveScreen = memo(() => {
             hive ? (
               <TouchableOpacity
                 onPress={() => {
-                  console.log('Header menu button pressed');
+                  logger.debug('Header menu button pressed');
                   openHeaderMenu();
                 }}
                 style={styles.headerMenuButton}
                 activeOpacity={0.7}
                 hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Opções da colmeia"
+                accessibilityHint="Abre o menu com opções adicionais para esta colmeia"
               >
                 <MaterialCommunityIcons name="dots-vertical" size={24} color={colors.headerText} />
               </TouchableOpacity>

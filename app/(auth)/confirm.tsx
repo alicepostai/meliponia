@@ -4,6 +4,8 @@ import { Alert } from 'react-native';
 import { supabase } from '@/services/supabase';
 import { View, Text } from 'react-native';
 import ScreenWrapper from '@/components/ui/screen-wrapper';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 export default function ConfirmEmailScreen() {
   const router = useRouter();
@@ -22,30 +24,42 @@ export default function ConfirmEmailScreen() {
           });
 
           if (error) {
-            console.error('Erro ao confirmar email:', error);
-            Alert.alert(
-              'Erro na Confirmação',
+            logger.error('Erro ao confirmar email:', error);
+            AlertService.showError(
               'Não foi possível confirmar seu email. Tente fazer login novamente.',
-              [{ text: 'OK', onPress: () => router.replace('/(auth)/login') }],
+              {
+                title: 'Erro na Confirmação',
+                onAction: () => router.replace('/(auth)/login')
+              }
             );
             return;
           }
 
-          Alert.alert(
-            'Email Confirmado!',
+          AlertService.showSuccess(
             'Sua conta foi confirmada com sucesso. Você já está logado!',
-            [{ text: 'Continuar', onPress: () => router.replace('/(app)/(tabs)') }],
+            {
+              title: 'Email Confirmado!',
+              actionText: 'Continuar',
+              onAction: () => router.replace('/(app)/(tabs)')
+            }
           );
         } catch (error) {
-          console.error('Erro inesperado:', error);
-          Alert.alert('Erro', 'Ocorreu um erro inesperado. Tente fazer login novamente.', [
-            { text: 'OK', onPress: () => router.replace('/(auth)/login') },
-          ]);
+          logger.error('Erro inesperado:', error);
+          AlertService.showError(
+            'Ocorreu um erro inesperado. Tente fazer login novamente.',
+            {
+              onAction: () => router.replace('/(auth)/login')
+            }
+          );
         }
       } else {
-        Alert.alert('Link Inválido', 'O link de confirmação está inválido ou expirado.', [
-          { text: 'OK', onPress: () => router.replace('/(auth)/login') },
-        ]);
+        AlertService.showError(
+          'O link de confirmação está inválido ou expirado.',
+          {
+            title: 'Link Inválido',
+            onAction: () => router.replace('/(auth)/login')
+          }
+        );
       }
     };
 

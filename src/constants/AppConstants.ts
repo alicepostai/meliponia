@@ -11,7 +11,7 @@ export const ACTION_TYPES = {
   INSPECTION: 'Revisão',
   MAINTENANCE: 'Manejo',
   TRANSFER: 'Transferência',
-  DIVISION: 'Divisão de Enxame',
+  DIVISION: 'Divisão de Colmeia',
 } as const;
 export const TRANSACTION_TYPES = {
   DONATION: 'Doação',

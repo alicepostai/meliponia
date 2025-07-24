@@ -58,8 +58,7 @@ export default function AppLayout() {
       <Stack.Screen
         name="actions/division"
         options={{
-          //...modalScreenOptions,
-          title: 'Registrar Divisão de Enxame',
+          title: 'Registrar Divisão de Colmeia',
         }}
       />
 

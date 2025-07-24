@@ -8,6 +8,7 @@ import ScreenWrapper from '@/components/ui/screen-wrapper';
 import { usePermissionContext } from '@/contexts/PermissionContext';
 import { useQRScannerScreenStyles } from './styles';
 import { DeepLinkingUtils } from '@/utils/deep-linking';
+import { logger } from '@/utils/logger';
 const APP_SCHEME = 'meliponia';
 const QRScannerScreen = memo(() => {
   const styles = useQRScannerScreenStyles();
@@ -16,15 +17,15 @@ const QRScannerScreen = memo(() => {
   const [isProcessing, setIsProcessing] = useState(false);
   const router = useRouter();
 
-  console.log('QRScannerScreen render', {
+  logger.debug('QRScannerScreen render', {
     cameraPermission: status.camera,
     loading: status.loading,
   });
 
   useEffect(() => {
-    console.log('QRScannerScreen useEffect permission check');
+    logger.debug('QRScannerScreen useEffect permission check');
     if (!status.camera && !status.loading) {
-      console.log('Requesting camera permission...');
+      logger.debug('Requesting camera permission...');
       requestCameraPermission();
     }
   }, [status.camera, status.loading, requestCameraPermission]);
@@ -32,13 +33,12 @@ const QRScannerScreen = memo(() => {
     if (scanned) return;
     setScanned(true);
 
-    console.log('QR Code escaneado:', data);
+    logger.info('QR Code escaneado:', data);
 
-    // Verifica se é um QR code de colmeia
     if (DeepLinkingUtils.isHiveQRCode(data)) {
       const hiveId = DeepLinkingUtils.extractHiveIdFromUrl(data);
       if (hiveId) {
-        console.log('Navegando para colmeia:', hiveId);
+        logger.info('Navegando para colmeia:', hiveId);
         router.replace(`/hive/${hiveId}`);
       } else {
         Alert.alert('QR Code Inválido', 'Este QR code não é válido para acesso a colmeias.', [
@@ -46,7 +46,6 @@ const QRScannerScreen = memo(() => {
         ]);
       }
     }
-    // Verifica se é um QR code de transferência
     else if (DeepLinkingUtils.isTransferQRCode(data)) {
       try {
         let transferData;

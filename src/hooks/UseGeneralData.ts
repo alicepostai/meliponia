@@ -6,6 +6,7 @@ import { AggregatedData } from '@/types/DataTypes';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/services/supabase';
 import { RealtimeChannel } from '@supabase/supabase-js';
+import { logger } from '@/utils/logger';
 export const useGeneralData = () => {
   const { user } = useAuth();
   const [data, setData] = useState<AggregatedData | null>(null);
@@ -40,12 +41,14 @@ export const useGeneralData = () => {
   );
   useEffect(() => {
     if (!user?.id) return;
-    const handleDbChange = (table: string) => {
-      console.log(`useGeneralData: Mudança detectada na tabela ${table}, re-buscando dados.`);
+    
+    const handleDbChange = () => {
       fetchData(false);
     };
+    
     const tablesToSubscribe: string[] = ['hive', 'hive_harvest', 'hive_transaction', 'hive_action'];
     channelsRef.current.forEach(channel => hiveService.unsubscribeChannel(channel));
+    
     channelsRef.current = tablesToSubscribe.map(table => {
       const channelName = `public:${table}:user_id=eq.${user.id}`;
       return supabase
@@ -53,15 +56,12 @@ export const useGeneralData = () => {
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table, filter: `user_id=eq.${user.id}` },
-          () => handleDbChange(table),
+          handleDbChange,
         )
-        .subscribe(status => {
-          if (status === 'SUBSCRIBED') console.log(`useGeneralData: Inscrito em ${table}.`);
-          else console.log(`useGeneralData: Status da subscrição de ${table}: ${status}`);
-        });
+        .subscribe();
     });
+    
     return () => {
-      console.log('useGeneralData: Removendo subscrições...');
       channelsRef.current.forEach(channel => hiveService.unsubscribeChannel(channel));
       channelsRef.current = [];
     };

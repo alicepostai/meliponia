@@ -11,6 +11,7 @@ import {
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from '@/contexts/ThemeContext';
 import { fonts } from '@/theme/fonts';
+import { logger } from '@/utils/logger';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -102,10 +103,10 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
     const { x, y, width, height } = currentStepData.target;
     const padding = 8;
 
-    console.log('🎯 Renderizando highlight para step:', currentStep + 1);
-    console.log('📍 Coordenadas originais:', { x, y, width, height });
-    console.log('📱 Dimensões da tela:', { screenWidth, screenHeight });
-    console.log('🎯 Posição relativa na tela:', {
+    logger.debug('🎯 Renderizando highlight para step:', currentStep + 1);
+    logger.debug('📍 Coordenadas originais:', { x, y, width, height });
+    logger.debug('📱 Dimensões da tela:', { screenWidth, screenHeight });
+    logger.debug('🎯 Posição relativa na tela:', {
       'X (% da largura)': ((x / screenWidth) * 100).toFixed(1) + '%',
       'Y (% da altura)': ((y / screenHeight) * 100).toFixed(1) + '%',
     });
@@ -113,8 +114,8 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
     const isCircular = width <= 60 && height <= 60 && Math.abs(width - height) <= 10;
     const radius = isCircular ? Math.max(width, height) / 2 + padding : 12;
 
-    console.log('🔵 Tipo de elemento:', isCircular ? 'CIRCULAR' : 'RETANGULAR');
-    console.log('📏 Raio calculado:', radius);
+    logger.debug('🔵 Tipo de elemento:', isCircular ? 'CIRCULAR' : 'RETANGULAR');
+    logger.debug('📏 Raio calculado:', radius);
 
     return (
       <>
@@ -221,7 +222,7 @@ export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({
       };
     }
 
-    console.log('📍 Posição do tooltip calculada:', {
+    logger.debug('📍 Posição do tooltip calculada:', {
       position: currentStepData.position,
       targetY: y,
       targetHeight: height,

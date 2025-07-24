@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { AuthError, Session, User } from '@/types/supabase';
 import { AlertService } from './AlertService';
+import { logger } from '@/utils/logger';
 
 interface AuthResponse {
   data: { session: Session | null; user: User | null } | null;
@@ -23,7 +24,7 @@ const handleAuthError = (error: unknown, context: string): { data: null; error: 
       ? error
       : new AuthError(error instanceof Error ? error.message : 'Unknown authentication error');
 
-  console.error(`Error during ${context}:`, authError);
+  logger.error(`AuthService.${context}: Authentication error:`, authError);
   AlertService.showError(authError.message);
 
   return { data: null, error: authError };
@@ -34,22 +35,26 @@ export const authService = {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        console.error('Erro no signIn do Supabase:', error.message);
+        logger.error('AuthService.signIn: Supabase authentication failed:', error.message);
         return { data: null, error };
       }
 
-      console.log('Login bem-sucedido, sessão estabelecida.');
+      logger.info('AuthService.signIn: Login successful, session established');
       return { data, error: null };
     } catch (e) {
-      console.error('Erro inesperado no signIn:', e);
-      const error = new AuthError('Um erro inesperado ocorreu durante o login.');
-      AlertService.showError('Erro Inesperado' + error.message);
+      logger.error('AuthService.signIn: Unexpected error occurred:', e);
+      const error = new AuthError('AuthService.signIn: An unexpected error occurred during login');
+      AlertService.showError('Unexpected Error: ' + error.message);
       return { data: null, error };
     }
   },
   signUp: async ({ email, password }: SignInCredentials): Promise<AuthResponse> => {
     try {
-      console.log('AuthService: Iniciando processo de cadastro para:', email);
+      logger.info('AuthService.signUp: Starting signup process for:', email);
+
+      if (password.length < 8) {
+        throw new Error('AuthService.signUp: Password must be at least 8 characters');
+      }
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -59,93 +64,52 @@ export const authService = {
         },
       });
 
-      console.log('AuthService: Resultado do signUp:', {
+      logger.debug('AuthService.signUp: Signup result:', {
         hasData: !!data,
         hasUser: !!data?.user,
         hasSession: !!data?.session,
         hasError: !!error,
         errorMessage: error?.message,
-        userData: data?.user ? { id: data.user.id, email: data.user.email } : null,
+        userData: data?.user ? { id: data.user.id } : null,
       });
 
       if (error) {
-        console.log('AuthService: Erro detectado:', error.message);
-
-        const existingUserErrors = [
-          'user already registered',
-          'email already exists',
-          'email already taken',
-          'duplicate',
-          'already been registered',
-          'email rate limit exceeded',
-          'rate limit exceeded',
-          'too many requests',
-          'signup disabled',
-        ];
-
-        const errorMessage = error.message.toLowerCase();
-        const isExistingUser = existingUserErrors.some(errorText =>
-          errorMessage.includes(errorText),
-        );
-
-        if (isExistingUser) {
-          console.log('AuthService: Detectado que usuário já existe via erro');
-          throw new Error('User already registered');
-        }
-
-        throw error;
+        logger.debug('AuthService.signUp: Error detected:', error.message);
+        
+        throw new Error('AuthService.signUp: Could not complete registration - please try again or login if you already have an account');
       }
 
-      if (data?.user) {
-        const userCreatedAt = new Date(data.user.created_at);
-        const now = new Date();
-        const timeDiffSeconds = (now.getTime() - userCreatedAt.getTime()) / 1000;
-
-        console.log('AuthService: Análise do usuário:', {
-          userCreatedAt: userCreatedAt.toISOString(),
-          currentTime: now.toISOString(),
-          timeDiffSeconds,
-          isNewUser: timeDiffSeconds < 10,
-        });
-
-        if (timeDiffSeconds > 10) {
-          console.log('AuthService: Usuário já existia - detectado via timestamp');
-          throw new Error('User already registered');
-        }
+      if (!data?.user) {
+        throw new Error('AuthService.signUp: Could not complete registration - please try again');
       }
 
-      if (data && !data.user) {
-        console.log('AuthService: SignUp retornou dados mas sem usuário - email já existente');
-        throw new Error('User already registered');
-      }
-
-      console.log('AuthService: Cadastro bem-sucedido - usuário novo criado');
+      logger.info('AuthService.signUp: Registration successful - new user created');
       return { data: { session: data.session, user: data.user }, error: null };
     } catch (error) {
-      console.log('AuthService: Erro capturado no signUp:', error);
-      return handleAuthError(error, 'Cadastro');
+      logger.error('AuthService.signUp: Error caught during signup:', error);
+      return handleAuthError(error, 'signUp');
     }
   },
   requestPasswordRecovery: async (
     email: string,
   ): Promise<{ data: object; error: AuthError | null }> => {
     try {
-      console.log('AuthService: Iniciando recuperação de senha para:', email);
+      logger.info('AuthService.requestPasswordRecovery: Starting password recovery for:', email);
 
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: 'meliponia://reset-password',
       });
 
       if (error) {
-        console.error('AuthService: Erro na recuperação de senha:', error.message);
+        logger.error('AuthService.requestPasswordRecovery: Password recovery failed:', error.message);
         throw error;
       }
 
-      console.log('AuthService: Email de recuperação enviado com sucesso');
+      logger.info('AuthService.requestPasswordRecovery: Recovery email sent successfully');
       return { data: data || {}, error: null };
     } catch (error) {
-      console.error('AuthService: Erro capturado na recuperação de senha:', error);
-      const { error: authError } = handleAuthError(error, 'Recuperação de Senha');
+      logger.error('AuthService.requestPasswordRecovery: Error caught during password recovery:', error);
+      const { error: authError } = handleAuthError(error, 'requestPasswordRecovery');
       return { data: {}, error: authError };
     }
   },
@@ -155,7 +119,7 @@ export const authService = {
       if (error) throw error;
       return { error: null };
     } catch (error) {
-      return { error: handleAuthError(error, 'Logout').error };
+      return { error: handleAuthError(error, 'signOut').error };
     }
   },
   getCurrentUser: async (): Promise<UserResponse> => {
@@ -185,7 +149,7 @@ export const authService = {
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
-      return handleAuthError(error, 'Alteração de Senha');
+      return handleAuthError(error, 'updateUserPassword');
     }
   },
   resendConfirmation: async (email: string): Promise<{ error: AuthError | null }> => {
@@ -200,7 +164,7 @@ export const authService = {
       if (error) throw error;
       return { error: null };
     } catch (error) {
-      return { error: handleAuthError(error, 'Reenvio de Confirmação').error };
+      return { error: handleAuthError(error, 'resendConfirmation').error };
     }
   },
 };

@@ -1,5 +1,6 @@
 import React, { forwardRef, ReactNode } from 'react';
 import OpenStreetMapComponent from './OpenStreetMapComponent';
+import { logger } from '@/utils/logger';
 
 interface BeeMarkerProps {
   id: string;
@@ -44,7 +45,7 @@ const UnifiedMapComponent = forwardRef<UnifiedMapComponentRef, UnifiedMapCompone
         if (React.isValidElement(child) && child.type === BeeMarker) {
           const props = child.props as BeeMarkerProps;
           if (!props.id) {
-            console.warn(
+            logger.warn(
               'BeeMarker está sem uma prop "id" única. Isso pode causar problemas de renderização.',
             );
           }

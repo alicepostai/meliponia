@@ -31,7 +31,7 @@ const TransferQRScreen = memo(() => {
   useEffect(() => {
     if (hive && user?.id) {
       const transferType = hive.status === 'Vendido' ? 'venda' : 'doacao';
-      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 horas
+      const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
       const qrContent = DeepLinkingUtils.generateTransferQRData(
         hive.id,

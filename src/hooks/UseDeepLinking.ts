@@ -4,29 +4,31 @@ import * as Linking from 'expo-linking';
 import { Alert } from 'react-native';
 import { DeepLinkingUtils } from '@/utils/deep-linking';
 import { hiveService } from '@/services/HiveService';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 
 export const useDeepLinking = () => {
   const router = useRouter();
 
   const handleDeepLink = useCallback(
     async (url: string) => {
-      console.log('Deep link recebido:', url);
+      logger.debug('Deep link recebido:', url);
 
       if (!url) return;
 
-      // Verifica se é um QR code de colmeia
       if (DeepLinkingUtils.isHiveQRCode(url)) {
         const hiveId = DeepLinkingUtils.extractHiveIdFromUrl(url);
         if (hiveId) {
-          console.log('Navegando para colmeia via deep link:', hiveId);
+          logger.info('Navegando para colmeia via deep link:', hiveId);
           router.push(`/hive/${hiveId}`);
         } else {
-          Alert.alert('QR Code Inválido', 'Este QR code não é válido para acesso a colmeias.');
+          AlertService.showError('Este QR code não é válido para acesso a colmeias.', {
+            title: 'QR Code Inválido'
+          });
         }
         return;
       }
 
-      // Verifica se é um QR code de transferência
       if (DeepLinkingUtils.isTransferQRCode(url)) {
         try {
           let transferData;
@@ -70,51 +72,54 @@ export const useDeepLinking = () => {
                     sourceUserId,
                     transferType,
                   );
-                  Alert.alert(
-                    result.success ? 'Transferência Realizada' : 'Erro na Transferência',
-                    result.message,
-                    [{ text: 'OK', onPress: () => router.push('/(app)/(tabs)') }],
-                  );
+                  if (result.success) {
+                    AlertService.showSuccess(result.message, {
+                      title: 'Transferência Realizada',
+                      onAction: () => router.push('/(app)/(tabs)')
+                    });
+                  } else {
+                    AlertService.showError(result.message, {
+                      title: 'Erro na Transferência'
+                    });
+                  }
                 },
               },
             ],
           );
         } catch (error: any) {
-          Alert.alert(
-            'QR Code de Transferência Inválido',
+          AlertService.showError(
             error.message || 'Não foi possível processar este QR code de transferência.',
+            {
+              title: 'QR Code de Transferência Inválido'
+            }
           );
         }
         return;
       }
 
-      // Verifica se é um link de recuperação de senha
       if (DeepLinkingUtils.isSupabaseRecoveryLink(url)) {
-        console.log('Processando link de recuperação de senha');
-        // Será processado pelo AuthContext
+        logger.debug('Processando link de recuperação de senha');
         return;
       }
 
-      console.log('Deep link não reconhecido:', url);
+      logger.warn('Deep link não reconhecido:', url);
     },
     [router],
   );
 
   useEffect(() => {
-    // Verifica se o app foi aberto por um deep link
     const getInitialURL = async () => {
       const initialURL = await Linking.getInitialURL();
       if (initialURL) {
-        console.log('App iniciado via deep link:', initialURL);
+        logger.info('App iniciado via deep link:', initialURL);
         handleDeepLink(initialURL);
       }
     };
 
     getInitialURL();
 
-    // Escuta novos deep links enquanto o app está rodando
     const subscription = Linking.addEventListener('url', ({ url }) => {
-      console.log('Deep link recebido enquanto app estava rodando:', url);
+      logger.debug('Deep link recebido enquanto app estava rodando:', url);
       handleDeepLink(url);
     });
 

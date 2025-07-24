@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient, PostgrestError } from '@supabase/supabase-js';
 import { DatabaseSchema } from '@/types/supabase';
+import { logger } from '@/utils/logger';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -8,7 +9,7 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 if (!supabaseUrl || !supabaseAnonKey) {
   const errorMessage =
     'Variáveis de ambiente Supabase não encontradas. Verifique seu arquivo .env (EXPO_PUBLIC_SUPABASE_URL, EXPO_PUBLIC_SUPABASE_ANON_KEY).';
-  console.error(errorMessage);
+  logger.error(errorMessage);
   throw new Error(errorMessage);
 }
 

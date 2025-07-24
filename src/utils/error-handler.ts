@@ -1,12 +1,13 @@
 import { PostgrestError } from '@/types/supabase';
 import { AlertService } from '@/services/AlertService';
 import NetInfo from '@react-native-community/netinfo';
+import { logger } from '@/utils/logger';
 
 export const createErrorHandler = (defaultContext: string) => {
   return (error: unknown, context?: string): { success: false; error: PostgrestError } => {
     const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
     const finalContext = context || defaultContext;
-    console.error(`Error during ${finalContext}:`, error);
+    logger.error(`Erro durante ${finalContext}:`, error);
     AlertService.showError(errorMessage);
     return {
       success: false,
@@ -25,7 +26,7 @@ export const createDataErrorHandler = (defaultContext: string) => {
   return (error: unknown, context?: string): { data: null; error: PostgrestError } => {
     const errorMessage = error instanceof Error ? error.message : 'Ocorreu um erro desconhecido.';
     const finalContext = context || defaultContext;
-    console.error(`Error during ${finalContext}:`, error);
+    logger.error(`Erro durante ${finalContext}:`, error);
     AlertService.showError(errorMessage);
     return {
       data: null,

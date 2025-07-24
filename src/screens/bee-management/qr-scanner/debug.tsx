@@ -2,13 +2,14 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
+import { logger } from '@/utils/logger';
 
 export default function DebugQRScannerScreen() {
   const { colors } = useTheme();
   const router = useRouter();
 
   const handleGoBack = () => {
-    console.log('Going back from debug QR scanner');
+    logger.debug('Going back from debug QR scanner');
     router.back();
   };
 

@@ -1,4 +1,5 @@
 import { AlertProviderRef } from '@/components/modals/alert-provider';
+import { logger } from '@/utils/logger';
 
 interface ShowErrorOptions {
   title?: string;
@@ -14,7 +15,6 @@ interface ShowSuccessOptions {
 
 const translateSupabaseError = (message: string): string => {
   const translations: Record<string, string> = {
-    // Autenticação
     'Invalid login credentials': 'E-mail ou senha incorretos',
     'Email not confirmed': 'Confirme seu e-mail antes de fazer login',
     'User already registered': 'Este e-mail já está cadastrado',
@@ -41,7 +41,6 @@ const translateSupabaseError = (message: string): string => {
     'Invalid token hash': 'Link de recuperação inválido. Solicite um novo link de recuperação.',
     'Token not found': 'Link de recuperação inválido. Solicite um novo link de recuperação.',
 
-    // Banco de dados
     'violates foreign key constraint': 'Este item está sendo usado e não pode ser excluído',
     'duplicate key value': 'Este valor já existe no sistema',
     'permission denied': 'Você não tem permissão para realizar esta ação',
@@ -55,7 +54,6 @@ const translateSupabaseError = (message: string): string => {
     'violates unique constraint': 'Este valor já existe no sistema',
     'violates check constraint': 'Valor não permitido para este campo',
 
-    // Storage
     'Bucket not found': 'Sistema de arquivos não configurado. Entre em contato com o suporte',
     'Object not found': 'Arquivo não encontrado',
     'The resource already exists': 'Este arquivo já existe',
@@ -67,7 +65,6 @@ const translateSupabaseError = (message: string): string => {
     'The specified bucket does not exist':
       'Sistema de arquivos não configurado. Entre em contato com o suporte',
 
-    // Rede
     fetch: 'Erro de conexão. Verifique sua internet',
     network: 'Erro de rede. Verifique sua conexão',
     timeout: 'Conexão expirou. Tente novamente',
@@ -76,7 +73,6 @@ const translateSupabaseError = (message: string): string => {
     'Network request failed': 'Erro de rede. Verifique sua conexão',
     NETWORK_ERROR: 'Erro de rede. Verifique sua conexão',
 
-    // Genéricos
     'Internal server error': 'Erro interno do servidor. Tente novamente',
     'Bad request': 'Requisição inválida. Verifique os dados enviados',
     Unauthorized: 'Não autorizado. Faça login novamente',
@@ -88,7 +84,6 @@ const translateSupabaseError = (message: string): string => {
     'Gateway timeout': 'Tempo limite excedido. Tente novamente',
     'Connection timeout': 'Tempo limite de conexão. Tente novamente',
 
-    // Erros específicos do app
     'Usuário não autenticado': 'Você precisa fazer login para continuar',
     'Não foi possível obter a localização atual':
       'Erro ao obter localização. Verifique suas permissões',
@@ -214,7 +209,7 @@ class AlertService {
         onAction: options.onAction,
       });
     } else {
-      console.warn('AlertProvider ref não disponível');
+      logger.warn('AlertProvider ref não disponível');
     }
   }
 
@@ -227,7 +222,7 @@ class AlertService {
         onAction: options.onAction,
       });
     } else {
-      console.warn('AlertProvider ref não disponível');
+      logger.warn('AlertProvider ref não disponível');
     }
   }
 

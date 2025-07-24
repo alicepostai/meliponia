@@ -18,7 +18,7 @@ const actionOptions: { label: string; value: ActionTypeFilter }[] = [
   { label: 'Colheita', value: 'Colheita' },
   { label: 'Manejo', value: 'Manejo' },
   { label: 'Transferência de Caixa', value: 'Transferência de Caixa' },
-  { label: 'Divisão de Enxame', value: 'Divisão de Enxame' },
+  { label: 'Divisão de Colmeia', value: 'Divisão de Colmeia' },
   { label: 'Divisão Origem', value: 'Divisão Origem' },
 ];
 interface FilterOptionProps {

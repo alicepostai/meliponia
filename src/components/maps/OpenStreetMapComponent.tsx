@@ -9,6 +9,7 @@ import React, {
 import { View, StyleSheet } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '@/contexts/ThemeContext';
+import { logger } from '@/utils/logger';
 
 const BEE_PIN_BASE64 =
   'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgZGF0YS1uYW1lPSJMYXllciAxIiBpZD0iTGF5ZXJfMSIgdmlld0JveD0iMCAwIDI3MiAyNzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHN0eWxlPi5jbHMtMXtmaWxsOiM0MjQyNDI7fS5jbHMtMntmaWxsOiNmZmViM2M7fS5jbHMtM3tmaWxsOiNlMmUzZTU7fTwvc3R5bGU+PC9kZWZzPjx0aXRsZS8+PHBhdGggY2xhc3M9ImNscy0xIiBkPSJNMTg0LDE0Mi44YzAsMTkuNzEtOS42LDQzLjYzLTIwLjIxLDY0QTM4Mi42NywzODIuNjcsMCwwLDEsMTM2LDI1MmEzODIuNjcsMzgyLjY3LDAsMCwxLTI3Ljc5LTQ1LjE1Qzk3LjYsMTg2LjQzLDg4LDE2Mi41MSw4OCwxNDIuOGMwLTEsMC0yLDAtM2ExMDIuMzksMTAyLjM5LDAsMCwxLDEuNDYtMTUuNTEsNzMuNjYsNzMuNjYsMCwwLDEsMS42NS03LjE4LDQ5LjQ2LDQ5LjQ2LDAsMCwxLDktMThDMTA4LjkyLDg4LjI3LDEyMS43Myw4NCwxMzYsODRzMjcuMDgsNC4yNywzNS44NywxNS4wOGE0OS40Niw0OS40NiwwLDAsMSw5LDE4LDczLjY2LDczLjY2LDAsMCwxLDEuNjUsNy4xOEExMDIuMzksMTAyLjM5LDAsMCwxLDE4NCwxMzkuNzhDMTg0LDE0MC43NywxODQsMTQxLjc4LDE4NCwxNDIuOFoiLz48cGF0aCBjbGFzcz0iY2xzLTIiIGQ9Ik0xNzEuODcsOTkuMThhNzYuNTgsNzYuNTgsMCwwLDEtNzEuNzQsMCw0OS40Niw0OS40NiwwLDAsMC05LDE4YzEuMjYsMSwyLjU4LDIsMy45NCwyLjkxYTczLjIyLDczLjIyLDAsMCwwLDQwLjkxLDEyLDczLjIyLDczLjIyLDAsMCwwLDQwLjkxLTEyYzEuMzYtLjkzLDIuNjgtMS44OSwzLjk0LTIuOTFBNDkuNDYsNDkuNDYsMCwwLDAsMTcxLjg3LDk5LjE4WiIvPjxwYXRoIGNsYXNzPSJjbHMtMiIgZD0iTTE4NCwxMzkuODhjLTExLjczLDEwLTI4Ljg3LDE2LjIyLTQ4LDE2LjIycy0zNi4yMy02LjI3LTQ4LTE2LjIyYzAsMSwwLDIsMCwzLDAsMTkuNzEsOS42LDQzLjYzLDIwLjIxLDY0YTc3LjU1LDc3LjU1LDAsMCwwLDU1LjU4LDBjMTAuNjEtMjAuNDIsMjAuMjEtNDQuMzQsMjAuMjEtNjRDMTg0LDE0MS44OCwxODQsMTQwLjg3LDE4NCwxMzkuODhaIi8+PGNpcmNsZSBjbGFzcz0iY2xzLTEiIGN4PSIxMzYiIGN5PSI2MCIgcj0iMzIiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMjAuMzEsMzZsNy45MS0yTDEyNSwyMi44NWE0LjEzLDQuMTMsMCwwLDAtNS0yLjcyaDBhMy44MywzLjgzLDAsMCwwLTIuODksNC43MVoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xNTEuNjcsMzZsLTcuOTEtMiwzLjE4LTExLjE1YTQuMTMsNC4xMywwLDAsMSw1LTIuNzJoMGEzLjgzLDMuODMsMCwwLDEsMi44OSw0LjcxWiIvPjxwYXRoIGNsYXNzPSJjbHMtMyIgZD0iTTE5Mi4yMiwxODMuNThjMjguMDcsMjguMDcsNDcsMjQuMiw2MSwxMC4xNnMxNy45LTMyLjkyLTEwLjE2LTYxUzE1MS41Niw5Mi4xLDE1MS41Niw5Mi4xLDE2NC4xNSwxNTUuNTEsMTkyLjIyLDE4My41OFoiLz48cGF0aCBjbGFzcz0iY2xzLTMiIGQ9Ik03OS43OCwxODMuNThjLTI4LjA3LDI4LjA3LTQ3LDI0LjItNjEsMTAuMTZTLjg5LDE2MC44MywyOSwxMzIuNzYsMTIwLjQ0LDkyLjEsMTIwLjQ0LDkyLjEsMTA3Ljg1LDE1NS41MSw3OS43OCwxODMuNThaIi8+PC9zdmc+';
@@ -62,7 +63,7 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
 
         updateMarkersTimeoutRef.current = setTimeout(() => {
           if (isMapReady && webViewRef.current) {
-            console.log(
+            logger.debug(
               '🗺️ RN: Enviando marcadores para WebView (debounced):',
               markersToUpdate.length,
             );
@@ -149,7 +150,6 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                 postMessage({ type: 'popupPress', id: markerId });
             }
 
-            logToRN('WebView: Inicializando mapa...');
             window.leafletMap = L.map('map').setView([${region.latitude}, ${region.longitude}], 10);
             window.markerLayer = L.layerGroup().addTo(window.leafletMap);
 
@@ -160,8 +160,6 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
 
             function addMarker(markerData) {
                 try {
-                    logToRN('WebView: Adicionando marcador:', markerData.id, markerData.coordinate);
-                    
                     const lat = markerData.coordinate.latitude || markerData.coordinate.lat;
                     const lng = markerData.coordinate.longitude || markerData.coordinate.lng;
                     
@@ -188,15 +186,12 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                     });
                     
                     window.markerLayer.addLayer(marker);
-                    logToRN('WebView: Marcador adicionado com sucesso:', markerData.id);
                 } catch (e) {
                     logToRN('WebView ERRO ao adicionar marcador:', e.message, markerData);
                 }
             }
 
             window.updateMarkers = function(markers) {
-                logToRN('WebView: updateMarkers chamado com', (markers || []).length, 'marcadores.');
-                
                 if (!window.existingMarkers) {
                     window.existingMarkers = new Map();
                 }
@@ -204,10 +199,7 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                 const newMarkerIds = new Set();
                 
                 if (markers && Array.isArray(markers) && markers.length > 0) {
-                    logToRN('WebView: Processando marcadores:', markers);
-                    
-                    markers.forEach((markerData, index) => {
-                        logToRN('WebView: Processando marcador', index + 1, 'de', markers.length, ':', markerData);
+                    markers.forEach((markerData) => {
                         newMarkerIds.add(markerData.id);
                         
                         const existingMarker = window.existingMarkers.get(markerData.id);
@@ -218,12 +210,10 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                         if (existingMarker && 
                             existingMarker.getLatLng().lat === lat &&
                             existingMarker.getLatLng().lng === lng) {
-                            logToRN('WebView: Marcador já existe na posição correta:', markerData.id);
                             return;
                         }
                         
                         if (existingMarker) {
-                            logToRN('WebView: Removendo marcador existente para atualizar posição:', markerData.id);
                             window.markerLayer.removeLayer(existingMarker);
                             window.existingMarkers.delete(markerData.id);
                         }
@@ -253,7 +243,6 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                             
                             window.markerLayer.addLayer(marker);
                             window.existingMarkers.set(markerData.id, marker);
-                            logToRN('WebView: Marcador adicionado/atualizado com sucesso:', markerData.id);
                         } catch (e) {
                             logToRN('WebView ERRO ao adicionar marcador:', e.message, markerData);
                         }
@@ -263,23 +252,18 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                 if (window.existingMarkers) {
                     for (const [markerId, marker] of window.existingMarkers.entries()) {
                         if (!newMarkerIds.has(markerId)) {
-                            logToRN('WebView: Removendo marcador que não está mais na lista:', markerId);
                             window.markerLayer.removeLayer(marker);
                             window.existingMarkers.delete(markerId);
                         }
                     }
                 }
-                
-                logToRN('WebView: Atualização de marcadores concluída.');
             };
 
             window.leafletMap.on('click', e => {
-                logToRN('WebView: Mapa clicado em:', e.latlng);
                 postMessage({ type: 'mapPress', coordinate: e.latlng });
             });
 
             window.handlePopupClick = function(markerId) {
-                logToRN('WebView: Popup clicado para marcador:', markerId);
                 postMessage({ type: 'popupPress', id: markerId });
             };
 
@@ -288,7 +272,6 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                 ? `
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(pos => {
-                        logToRN('WebView: Localização do usuário obtida:', pos.coords);
                         const userIcon = L.divIcon({ 
                             className: 'user-location', 
                             html: '<div style="width: 20px; height: 20px; background-color: #007AFF; border: 3px solid white; border-radius: 50%; box-shadow: 0 0 5px rgba(0,0,0,0.3);"></div>', 
@@ -299,13 +282,12 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
                             zIndexOffset: 1000 
                         }).addTo(window.leafletMap);
                     }, error => {
-                        logToRN('WebView: Erro ao obter localização do usuário:', error.message);
+                        logToRN('WebView: Erro ao obter localização:', error.message);
                     });
                 }`
                 : ''
             }
 
-            logToRN('WebView: Mapa inicializado. Enviando evento "mapReady".');
             postMessage({ type: 'mapReady' });
         </script>
     </body>
@@ -316,19 +298,19 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
         const data = JSON.parse(event.nativeEvent.data);
 
         if (data.type === 'log') {
-          console.log(`[WebView] ${data.message}`, ...(data.args || []));
+          logger.debug(`[WebView] ${data.message}`, ...(data.args || []));
           return;
         }
 
-        console.log('🗺️ RN: Mensagem recebida da WebView:', data.type);
+        logger.debug('🗺️ RN: Mensagem recebida da WebView:', data.type);
 
         if (data.type === 'mapReady') {
           if (!isMapReady) {
-            console.log('🗺️ RN: Mapa está pronto, enviando marcadores iniciais...');
+            logger.debug('🗺️ RN: Mapa está pronto, enviando marcadores iniciais...');
             setMapReady(true);
             setTimeout(() => {
               if (markers.length > 0 && webViewRef.current) {
-                console.log('🗺️ RN: Enviando marcadores iniciais:', markers.length);
+                logger.debug('🗺️ RN: Enviando marcadores iniciais:', markers.length);
                 const script = `window.updateMarkers && window.updateMarkers(${JSON.stringify(
                   markers,
                 )});`;
@@ -337,17 +319,17 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
             }, 500);
           }
         } else if (data.type === 'markerPress') {
-          console.log('🗺️ RN: Marcador clicado, popup aberto');
+          logger.debug('🗺️ RN: Marcador clicado, popup aberto');
         } else if (data.type === 'popupPress') {
           const marker = markers.find(m => m.id === data.id);
-          console.log('🗺️ RN: Popup clicado, navegando para colmeia:', data.id);
+          logger.debug('🗺️ RN: Popup clicado, navegando para colmeia:', data.id);
           marker?.onPress?.();
         } else if (data.type === 'mapPress' && onMapPress) {
           const normalizedCoordinate = {
             latitude: data.coordinate.lat,
             longitude: data.coordinate.lng,
           };
-          console.log(
+          logger.debug(
             '🗺️ RN: Map press detected, calling onMapPress with normalized coordinate:',
             normalizedCoordinate,
           );
@@ -365,7 +347,7 @@ const OpenStreetMapComponent = forwardRef<OpenStreetMapRef, OpenStreetMapProps>(
           onMessage={handleMessage}
           javaScriptEnabled={true}
           domStorageEnabled={true}
-          onError={error => console.error('🗺️ RN: WebView erro:', error.nativeEvent)}
+          onError={error => logger.error('🗺️ RN: WebView erro:', error.nativeEvent)}
         />
       </View>
     );

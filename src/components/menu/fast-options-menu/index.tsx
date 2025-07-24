@@ -4,6 +4,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import { useTheme } from '@/contexts/ThemeContext';
 import { fonts, fontSizes } from '@/theme/fonts';
 import { metrics } from '@/theme/metrics';
+import { logger } from '@/utils/logger';
 
 interface OptionItem {
   label: string;
@@ -108,11 +109,11 @@ const FastOptionsMenu = memo(
     );
 
     if (!isVisible) {
-      console.log('FastOptionsMenu: isVisible is false, not rendering');
+      logger.debug('FastOptionsMenu: isVisible is false, not rendering');
       return null;
     }
 
-    console.log('FastOptionsMenu: Rendering menu with options:', options.length);
+    logger.debug('FastOptionsMenu: Rendering menu with options:', options.length);
 
     const topPosition = anchorPosition?.y ?? topOffset ?? 90;
 

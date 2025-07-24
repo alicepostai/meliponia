@@ -2,6 +2,8 @@ import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import { FormikHelpers } from 'formik';
 import { useCommonNavigation } from './UseCommonNavigation';
+import { logger } from '@/utils/logger';
+import { AlertService } from '@/services/AlertService';
 interface UseFormSubmissionOptions<T> {
   onSubmit: (values: T, actions: FormikHelpers<T>) => Promise<{ success: boolean }>;
   onSuccess?: () => void;
@@ -26,7 +28,7 @@ export const useFormSubmission = <T>({
             typeof validationResult === 'string'
               ? validationResult
               : 'Preencha todos os campos obrigatórios.';
-          Alert.alert('Dados Inválidos', errorMessage);
+          AlertService.showValidationError(errorMessage);
           return;
         }
       }
@@ -36,7 +38,7 @@ export const useFormSubmission = <T>({
         const result = await onSubmit(values, formikActions);
         if (result.success) {
           if (successMessage) {
-            Alert.alert('Sucesso!', successMessage);
+            AlertService.showSuccess(successMessage);
           }
           if (onSuccess) {
             onSuccess();
@@ -45,8 +47,10 @@ export const useFormSubmission = <T>({
           }
         }
       } catch (error) {
-        console.error('Error in form submission:', error);
-        Alert.alert('Erro Inesperado', 'Ocorreu um problema. Tente novamente em alguns instantes.');
+        logger.error('Error in form submission:', error);
+        AlertService.showError('Ocorreu um problema. Tente novamente em alguns instantes.', {
+          title: 'Erro Inesperado'
+        });
       } finally {
         setIsSubmitting(false);
         formikActions.setSubmitting(false);

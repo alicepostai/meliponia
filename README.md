@@ -16,11 +16,11 @@
 
 ## 📖 Sobre o Projeto
 
-O **Meliponia** é um aplicativo mobile desenvolvido para meliponicultores que desejam gerenciar suas colmeias de abelhas sem ferrão de forma profissional e organizada. O aplicativo oferece ferramentas completas para registro, monitoramento e análise das atividades apícolas.
+O **Meliponia** é um aplicativo mobile desenvolvido para meliponicultores que desejam gerenciar suas colmeias de abelhas sem ferrão de forma profissional e organizada. O aplicativo oferece ferramentas completas para registro, monitoramento e análise das atividades meliponícolas.
 
 ### 🎯 Objetivos
 
-- **Facilitar** o gerenciamento de colmeias e atividades apícolas
+- **Facilitar** o gerenciamento de colmeias e atividades meliponícolas
 - **Centralizar** informações sobre abelhas sem ferrão brasileiras
 - **Otimizar** o controle de produção e saúde das colmeias
 - **Promover** práticas sustentáveis na meliponicultura

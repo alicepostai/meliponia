@@ -1,4 +1,5 @@
 import { DbHive, PostgrestError } from '@/types/supabase';
+import { logger } from '@/utils/logger';
 
 export type CreateHiveData = Pick<
   DbHive,
@@ -62,7 +63,7 @@ export const handleServiceError = (
     errorMessage = error.message;
   }
 
-  console.error(`Error during ${context}:`, error);
+  logger.error(`Error during ${context}:`, error);
 
   return {
     data: null,
@@ -102,7 +103,7 @@ export const handleActionError = (
     errorMessage = error.message;
   }
 
-  console.error(`Error during ${context}:`, error);
+  logger.error(`Error during ${context}:`, error);
 
   return {
     success: false,

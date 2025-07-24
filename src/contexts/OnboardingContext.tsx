@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { onboardingService, OnboardingStatus } from '@/services/OnboardingService';
 import { useAuth } from '@/contexts/AuthContext';
+import { logger } from '@/utils/logger';
 
 interface OnboardingContextType {
   onboardingStatus: OnboardingStatus;
@@ -38,10 +39,10 @@ export const OnboardingProvider: React.FC<OnboardingProviderProps> = ({ children
       }
 
       const status = await onboardingService.getStatus();
-      console.log('OnboardingContext - Status carregado:', status);
+      logger.debug('OnboardingContext - Status carregado:', status);
       setOnboardingStatus(status);
     } catch (error) {
-      console.error('Erro ao carregar status do onboarding:', error);
+      logger.error('Erro ao carregar status do onboarding:', error);
       setOnboardingStatus({
         hasSeenOnboarding: false,
         hasSeenTutorial: false,

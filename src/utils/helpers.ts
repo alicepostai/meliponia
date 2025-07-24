@@ -1,5 +1,6 @@
 import { BeeSpecies } from '@/types/ConstantsTypes';
 import { species as beeSpeciesData } from '@/constants/BeeSpeciesList';
+import { logger } from '@/utils/logger';
 export const formatDate = (date: string | Date | null | undefined): string => {
   if (!date) return '';
   try {
@@ -13,7 +14,7 @@ export const formatDate = (date: string | Date | null | undefined): string => {
       year: 'numeric',
     });
   } catch (error) {
-    console.error('Error formatting date:', error);
+    logger.error('helpers.formatDate: Falha ao formatar data:', error);
     return '';
   }
 };
@@ -41,7 +42,7 @@ export const formatDateTime = (date: string | Date | null | undefined): string =
       minute: '2-digit',
     });
   } catch (error) {
-    console.error('Error formatting date and time:', error);
+    logger.error('helpers.formatDateTime: Falha ao formatar data e hora:', error);
     return '';
   }
 };
@@ -57,7 +58,7 @@ export const formatDateWithWeekdayAndTime = (date: string | Date | null | undefi
     const formattedDateTime = formatDateTime(dateObj);
     return `${capitalizedWeekday} - ${formattedDateTime}`;
   } catch (error) {
-    console.error('Error formatting date with weekday and time:', error);
+    logger.error('helpers.formatDateWithWeekdayAndTime: Falha ao formatar data com dia da semana:', error);
     return '';
   }
 };
@@ -96,7 +97,7 @@ export const getTimelineIconName = (type: string | undefined | null): string => 
     Revisão: 'check-circle-outline',
     Manejo: 'beekeeper',
     Transferência: 'transfer',
-    'Divisão de Enxame': 'call-split',
+    'Divisão de Colmeia': 'call-split',
     'Divisão Origem': 'source-branch',
     Venda: 'currency-usd',
     Doação: 'gift-outline',

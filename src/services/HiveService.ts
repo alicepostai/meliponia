@@ -5,6 +5,8 @@ import NetInfo from '@react-native-community/netinfo';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { CreateHiveData, UpdateHiveData, HiveListFilter, handleServiceError } from './types';
 import { serviceRegistry } from './ServiceRegistry';
+import { logger } from '@/utils/logger';
+import { AlertService } from './AlertService';
 
 export const hiveService = {
   fetchHiveById: async (hiveId: string): Promise<SupabaseSingleQueryResult<DbHive>> => {
@@ -13,7 +15,7 @@ export const hiveService = {
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
-      return handleServiceError(error, 'Buscar Detalhes da Colmeia');
+      return handleServiceError(error, 'HiveService.fetchHiveById: Failed to fetch hive details');
     }
   },
   fetchHivesByUserId: async (
@@ -41,7 +43,7 @@ export const hiveService = {
       if (error) throw error;
       return { data: data || [], error: null };
     } catch (error) {
-      const { error: handledError } = handleServiceError(error, 'Listar Colmeias');
+      const { error: handledError } = handleServiceError(error, 'HiveService.fetchHivesByUserId: Failed to list hives');
       return { data: null, error: handledError };
     }
   },
@@ -58,7 +60,7 @@ export const hiveService = {
       if (error) throw error;
       return { data: data || [], error: null };
     } catch (error) {
-      const { error: handledError } = handleServiceError(error, 'Buscar Colmeias Ativas');
+      const { error: handledError } = handleServiceError(error, 'HiveService.fetchActiveHivesForSelection: Failed to fetch active hives');
       return { data: null, error: handledError };
     }
   },
@@ -95,7 +97,7 @@ export const hiveService = {
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
-      return handleServiceError(error, 'Cadastrar Colmeia');
+      return handleServiceError(error, 'HiveService.createHive: Failed to create hive');
     }
   },
   updateHive: async (
@@ -126,7 +128,7 @@ export const hiveService = {
       if (error) throw error;
       return { data, error: null };
     } catch (error) {
-      return handleServiceError(error, 'Atualizar Colmeia');
+      return handleServiceError(error, 'HiveService.updateHive: Failed to update hive');
     }
   },
   deleteHiveCascade: async (
@@ -135,9 +137,11 @@ export const hiveService = {
     const netState = await NetInfo.fetch();
     if (!netState.isConnected || !netState.isInternetReachable) {
       await serviceRegistry.getOfflineSyncService().queueAction('deleteHive', { hiveId });
-      Alert.alert(
-        'Modo Offline',
+      AlertService.showError(
         'Você está sem conexão. A exclusão foi salva e será processada assim que a internet voltar.',
+        {
+          title: 'Modo Offline'
+        }
       );
       return { success: true, error: null };
     }
@@ -169,7 +173,7 @@ export const hiveService = {
 
       return { success: true, error: null };
     } catch (error) {
-      const { error: handledError } = handleServiceError(error, 'Excluir Colmeia');
+      const { error: handledError } = handleServiceError(error, 'HiveService.deleteHiveCascade: Failed to delete hive and related records');
       return { success: false, error: handledError };
     }
   },
@@ -189,8 +193,8 @@ export const hiveService = {
       if (error) throw new Error(error.message);
       return { success: true, message: 'Colmeia transferida com sucesso!' };
     } catch (error: any) {
-      console.error('Erro ao processar transferência:', error);
-      return { success: false, message: error.message || 'Falha na transferência.' };
+      logger.error('HiveService.processHiveTransfer: Transfer processing failed:', error);
+      return { success: false, message: error.message || 'HiveService.processHiveTransfer: Transfer failed' };
     }
   },
   subscribeToHiveChanges: (
@@ -204,16 +208,12 @@ export const hiveService = {
         'postgres_changes',
         { event: '*', schema: 'public', table: 'hive', filter: `user_id=eq.${userId}` },
         payload => {
-          console.log('Real-time: Mudança na tabela de colmeias detectada!', payload);
           callback(payload);
         },
       )
       .subscribe(status => {
         if (status === 'SUBSCRIBED')
-          console.log(
-            `Real-time: Inscrito com sucesso nas mudanças da tabela 'hive' para o usuário ${userId}.`,
-          );
-        else console.log(`Real-time: Novo status do canal de colmeias: ${status}`);
+          logger.info(`HiveService.subscribeToHiveChanges: Successfully subscribed to hive changes for user ${userId}`);
       });
     return channel;
   },
@@ -221,9 +221,9 @@ export const hiveService = {
     if (channel) {
       try {
         await supabase.removeChannel(channel);
-        console.log('Real-time: Canal removido com sucesso.');
+        logger.info('HiveService.unsubscribeChannel: Channel removed successfully');
       } catch (error) {
-        console.error('Erro ao remover canal Supabase:', error);
+        logger.error('HiveService.unsubscribeChannel: Failed to remove channel:', error);
       }
     }
   },

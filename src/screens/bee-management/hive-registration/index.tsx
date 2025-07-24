@@ -53,7 +53,7 @@ const HiveRegistrationScreen = memo(() => {
   return (
     <>
       <ScreenWrapper scrollable>
-        <Stack.Screen options={{ title: 'Cadastrar Enxame' }} />
+        <Stack.Screen options={{ title: 'Cadastrar Colmeia' }} />
         <Formik<HiveRegistrationFormValues>
           innerRef={formikRef}
           initialValues={{
@@ -83,7 +83,7 @@ const HiveRegistrationScreen = memo(() => {
           }) => (
             <View style={styles.formContainer}>
               <View style={styles.formSection}>
-                <Text style={styles.sectionTitle}>Dados do Enxame</Text>
+                <Text style={styles.sectionTitle}>Dados da Colmeia</Text>
                 <View style={styles.fieldsGroupContainer}>
                   <View style={styles.fieldWrapper}>
                     <ImageComboBox
@@ -199,7 +199,7 @@ const HiveRegistrationScreen = memo(() => {
                       isGettingLocation={isGettingLocation}
                       onGetCurrentLocation={getCurrentLocation}
                       onOpenLocationPicker={openLocationPicker}
-                      label="Localização do Enxame"
+                      label="Localização da Colmeia"
                     />
                   </View>
                 </View>
@@ -225,7 +225,7 @@ const HiveRegistrationScreen = memo(() => {
                 </View>
               </View>
               <MainButton
-                title="Cadastrar Enxame"
+                title="Cadastrar Colmeia"
                 onPress={() => handleSubmit()}
                 loading={isSubmitting || formikSubmitting || isGettingLocation}
                 disabled={isSubmitting || formikSubmitting || isGettingLocation}

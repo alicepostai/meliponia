@@ -10,6 +10,7 @@ import {
 import { HiveDetails, HiveTimelineItem, ProcessedHiveListItem } from '@/types/DataTypes';
 import { getBeeNameById, getBeeImageUrlById, formatCurrency, formatWeightGrams } from './helpers';
 import { supabase } from '@/services/supabase';
+import { logger } from '@/utils/logger';
 export const processHiveDataForList = (hives: DbHive[] | null): ProcessedHiveListItem[] => {
   if (!hives) return [];
   return hives
@@ -49,7 +50,7 @@ const fetchActionDetails = async (actionType: string, actionId: string | null | 
   try {
     const { data, error } = await supabase.from(tableName).select('*').eq('id', actionId).single();
     if (error) {
-      console.warn(
+      logger.warn(
         `Erro ao buscar detalhes da ação ${actionType} (ID: ${actionId}):`,
         error.message,
       );
@@ -57,7 +58,7 @@ const fetchActionDetails = async (actionType: string, actionId: string | null | 
     }
     return data || {};
   } catch (e) {
-    console.error(`Exceção ao buscar detalhes da ação ${actionType}:`, e);
+    logger.error(`Exceção ao buscar detalhes da ação ${actionType}:`, e);
     return {};
   }
 };
@@ -153,7 +154,7 @@ export const processTimelineData = async (
           observation: item.observation,
         };
       } catch (e) {
-        console.error(`Erro ao processar item da timeline ID ${item.id}:`, e);
+        logger.error(`Erro ao processar item da timeline ID ${item.id}:`, e);
         return null;
       }
     }),

@@ -6,6 +6,7 @@ import * as Location from 'expo-location';
 import { hiveService } from '@/services/HiveService';
 import { CreateHiveData } from '@/services/types';
 import { HiveOrigin } from '@/types/ConstantsTypes';
+import { logger } from '@/utils/logger';
 export interface HiveRegistrationFormValues {
   species: any | null;
   state: any | null;
@@ -50,20 +51,20 @@ export const useHiveRegistrationForm = () => {
   const closeLocationPicker = useCallback(() => setIsLocationPickerVisible(false), []);
   const handleLocationSelected = useCallback(
     (location: { latitude: number; longitude: number }) => {
-      console.log('HiveRegistrationForm: Received location from modal:', location);
+      logger.debug('HiveRegistrationForm: Received location from modal:', location);
       const formik = formikRef.current;
       if (formik) {
         formik.setFieldValue('latitude', location.latitude);
         formik.setFieldValue('longitude', location.longitude);
         formik.setFieldTouched('latitude', true);
         formik.setFieldTouched('longitude', true);
-        console.log(
+        logger.debug(
           'HiveRegistrationForm: Set form values - latitude:',
           location.latitude,
           'longitude:',
           location.longitude,
         );
-        console.log('HiveRegistrationForm: Current form values after update:', formik.values);
+        logger.debug('HiveRegistrationForm: Current form values after update:', formik.values);
       }
       closeLocationPicker();
     },
